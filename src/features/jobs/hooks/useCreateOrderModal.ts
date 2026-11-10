@@ -22,6 +22,10 @@ export const useCreateOrderModal = ({
   const [spFile, setSpFile] = useState<File | null>(null);
   const [rkbmFile, setRkbmFile] = useState<File | null>(null);
   const [rkbmBongkarFile, setRkbmBongkarFile] = useState<File | null>(null);
+  // 3 Persyaratan KSOP untuk Permohonan RKBM (Tahap Sales)
+  const [suratPenunjukanFile, setSuratPenunjukanFile] = useState<File | null>(null);
+  const [suratPermohonanFile, setSuratPermohonanFile] = useState<File | null>(null);
+  const [suratPernyataanFile, setSuratPernyataanFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
   // 2. Data Master Options
@@ -47,6 +51,9 @@ export const useCreateOrderModal = ({
   const rawTonnage = useWatch({ control, name: "estimatedTonnage" });
   const selectedRateType = useWatch({ control, name: "rateType" });
   const selectedRkbmType = useWatch({ control, name: "rkbmType" });
+  const selectedIncludeCoo = useWatch({ control, name: "includeCoo" });
+  const selectedSpotRateAmount = useWatch({ control, name: "spotRateAmount" });
+  const selectedShipmentType = useWatch({ control, name: "shipmentType" });
 
   // 5. Derived Values dari Utilitas
   const contractInfo = useMemo(
@@ -68,6 +75,9 @@ export const useCreateOrderModal = ({
     setSpFile(null);
     setRkbmFile(null);
     setRkbmBongkarFile(null);
+    setSuratPenunjukanFile(null);
+    setSuratPermohonanFile(null);
+    setSuratPernyataanFile(null);
     setFileError(null);
     onClose();
   };
@@ -78,6 +88,9 @@ export const useCreateOrderModal = ({
       spFile,
       rkbmFile,
       rkbmBongkarFile,
+      suratPenunjukanFile,
+      suratPermohonanFile,
+      suratPernyataanFile,
       isEdit: Boolean(initialData),
     });
 
@@ -91,6 +104,9 @@ export const useCreateOrderModal = ({
       spFile,
       rkbmFile,
       rkbmBongkarFile,
+      suratPenunjukanFile,
+      suratPermohonanFile,
+      suratPernyataanFile,
       initialData,
     });
 
@@ -111,6 +127,8 @@ export const useCreateOrderModal = ({
   return {
     register,
     handleSubmit,
+    setValue,
+    control,
     errors,
     fileError,
     ...masterOptions,
@@ -118,6 +136,9 @@ export const useCreateOrderModal = ({
     selectedActivity,
     selectedRateType,
     selectedRkbmType,
+    selectedIncludeCoo,
+    selectedSpotRateAmount,
+    selectedShipmentType,
     contractInfo,
     pnbpPreview,
     spFile,
@@ -126,6 +147,12 @@ export const useCreateOrderModal = ({
     setRkbmFile,
     rkbmBongkarFile,
     setRkbmBongkarFile,
+    suratPenunjukanFile,
+    setSuratPenunjukanFile,
+    suratPermohonanFile,
+    setSuratPermohonanFile,
+    suratPernyataanFile,
+    setSuratPernyataanFile,
     handleClose,
     handleFormSubmit,
     handleCustomerChange,

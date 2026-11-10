@@ -4,10 +4,10 @@ import type { MasterItem } from "@/types/master/master-data";
 
 export interface SalesOrderFields {
   id: string;
-  vessel: string; // Mother Vessel (MV LARUS, dll)
+  vessel?: string; // Mother Vessel (MV LARUS, dll) - Wajib untuk PBM, opsional untuk Kepabeanan & COO
   customer: string;
-  endUser: string;
-  activityType: "Ekspor" | "Domestik" | "Impor";
+  endUser?: string; // Opsional/disembunyikan untuk Kepabeanan & COO
+  activityType?: "Ekspor" | "Domestik" | "Impor"; // Opsional/disembunyikan untuk Kepabeanan & COO
   service:
     | "Jasa PBM"
     | "Pengurusan RKBM"
@@ -22,16 +22,28 @@ export interface SalesOrderFields {
   notes?: string;
 
   // --- Inputan Armada yang Dipindahkan dari Operasional ke Sales ---
-  tugBoat?: string; // Nama Kapal
-  bargeNomination?: string; // Barge / Tongkang
-  shipmentType?: string; // Tipe pengapalan (misal: KS)
+  tugBoat?: string; // Nama Kapal - Mandatory untuk Kepabeanan & COO
+  bargeNomination?: string; // Barge / Tongkang - Mandatory untuk Kepabeanan & COO
+  shipmentType?: string; // Tipe pengapalan (Batu Bara, Batu Split, Alat Berat)
 
   // --- Khusus Layanan Pengurusan RKBM ---
   rkbmType?: "Bongkar" | "Muat" | "Muat & Bongkar"; // Validasi RKBM Bongkar atau Muat
-  rkbmDocName?: string; // Berkas RKBM Muat (atau Utama)
+  rkbmDocName?: string; // Berkas RKBM Muat (Approval Operasional)
   rkbmDocUrl?: string;
-  rkbmBongkarDocName?: string; // Berkas RKBM Bongkar (khusus opsi Muat & Bongkar)
+  rkbmBongkarDocName?: string; // Berkas RKBM Bongkar (Approval Operasional)
   rkbmBongkarDocUrl?: string;
+
+  // Persyaratan KSOP untuk Permohonan RKBM (Tahap Sales)
+  rkbmSuratPenunjukanDocName?: string;
+  rkbmSuratPenunjukanDocUrl?: string;
+  rkbmSuratPermohonanDocName?: string;
+  rkbmSuratPermohonanDocUrl?: string;
+  rkbmSuratPernyataanDocName?: string;
+  rkbmSuratPernyataanDocUrl?: string;
+
+  // --- Khusus Layanan Kepabeanan & COO ---
+  includeCoo?: boolean; // Checkbox apakah order termasuk COO
+  spotRateAmount?: number; // Nominal jika tarif Spot Rate
 
   // --- Khusus Layanan Jasa PBM & Dokumen Sales ---
   spDocName?: string; // Surat Penunjukan / SI
@@ -89,6 +101,13 @@ export interface CreateOrderModalFiles {
   rkbmDocUrl?: string;
   rkbmBongkarDocName?: string;
   rkbmBongkarDocUrl?: string;
+  // 3 Dokumen Persyaratan KSOP untuk RKBM
+  rkbmSuratPenunjukanDocName?: string;
+  rkbmSuratPenunjukanDocUrl?: string;
+  rkbmSuratPermohonanDocName?: string;
+  rkbmSuratPermohonanDocUrl?: string;
+  rkbmSuratPernyataanDocName?: string;
+  rkbmSuratPernyataanDocUrl?: string;
 }
 
 export interface CreateOrderModalProps {
@@ -112,6 +131,9 @@ export interface ValidateFilesParams {
   spFile: File | null;
   rkbmFile: File | null;
   rkbmBongkarFile: File | null;
+  suratPenunjukanFile?: File | null;
+  suratPermohonanFile?: File | null;
+  suratPernyataanFile?: File | null;
   isEdit: boolean;
 }
 
@@ -119,22 +141,8 @@ export interface BuildFilesParams {
   spFile: File | null;
   rkbmFile: File | null;
   rkbmBongkarFile: File | null;
-  initialData?: OrderItem | null;
-}
-
-export interface CreateOrderModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmitSuccess: (
-    data: OrderFormData,
-    files: {
-      spDocName?: string;
-      spDocUrl?: string;
-      rkbmDocName?: string;
-      rkbmDocUrl?: string;
-      rkbmBongkarDocName?: string;
-      rkbmBongkarDocUrl?: string;
-    },
-  ) => void;
+  suratPenunjukanFile?: File | null;
+  suratPermohonanFile?: File | null;
+  suratPernyataanFile?: File | null;
   initialData?: OrderItem | null;
 }

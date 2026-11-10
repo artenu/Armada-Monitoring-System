@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import { FileText, Eye, Trash2, Upload } from "lucide-react";
-import { Modal, Input, Select, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input, Select } from "@/components/forms";
 import type {
   MasterItem,
   MasterResourceKey,
@@ -32,7 +33,7 @@ export const MasterItemModal = ({
   onClose,
   onPreviewNpwp,
 }: MasterItemModalProps) => {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <Modal

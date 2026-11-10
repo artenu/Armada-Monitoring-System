@@ -172,7 +172,7 @@ export const useMasterData = () => {
 
   const handleSaveItem = (e: FormEvent) => {
     e.preventDefault();
-    if (!formData.nama.trim()) return;
+    if (!formData.nama.trim()) {return;}
 
     if (editingItem) {
       const updated = items.map((it) =>
@@ -300,7 +300,7 @@ export const useMasterData = () => {
   };
 
   const handleDeleteContract = (id?: string) => {
-    if (!id) return;
+    if (!id) {return;}
     if (confirm("Apakah Anda yakin ingin menghapus data tarif kontrak ini?")) {
       setContractRates((prev) => prev.filter((c) => c.id !== id));
     }
@@ -312,7 +312,7 @@ export const useMasterData = () => {
   };
 
   const getTabCount = (key: TabKey) => {
-    if (key === "tarif") return contractRates.length;
+    if (key === "tarif") {return contractRates.length;}
     return dataStore[key]?.length || 0;
   };
 

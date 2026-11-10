@@ -152,20 +152,23 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                 </tr>
               </THead>
               <TBody className="divide-y divide-slate-100 font-mono">
-                <TR className="hover:bg-transparent">
-                  <TD className="py-2.5 px-3 font-sans">
-                    Jasa Bongkar Muat Batubara (PBM) - DSR Sucofindo
-                  </TD>
-                  <TD className="py-2.5 px-3 text-right">
-                    {tonase.toLocaleString("id-ID")} MT
-                  </TD>
-                  <TD className="py-2.5 px-3 text-right">
-                    {formatRupiah(rate)}
-                  </TD>
-                  <TD className="py-2.5 px-3 text-right font-semibold">
-                    {formatRupiah(jasaPbm)}
-                  </TD>
-                </TR>
+                {/* 1. Baris Jasa PBM */}
+                {order.service === "Jasa PBM" && Boolean(jasaPbm) && (
+                  <TR className="hover:bg-transparent">
+                    <TD className="py-2.5 px-3 font-sans">
+                      Jasa Bongkar Muat ({order.shipmentType || "Batu Bara"}) - Final DSR
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right">
+                      {tonase.toLocaleString("id-ID")} MT
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right">
+                      {formatRupiah(rate)}
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right font-semibold">
+                      {formatRupiah(jasaPbm)}
+                    </TD>
+                  </TR>
+                )}
 
                 {Boolean(order.rkbmFee) && (
                   <TR className="hover:bg-transparent">
@@ -187,7 +190,7 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                   </TR>
                 )}
 
-                {Boolean(order.pnbpBarangAmount) && (
+                {order.service === "Jasa PBM" && Boolean(order.pnbpBarangAmount) && (
                   <TR className="text-slate-600 hover:bg-transparent">
                     <TD className="py-2 px-3 font-sans italic">
                       Reimbursement: PNBP Barang ({order.activityType})
@@ -202,7 +205,7 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                   </TR>
                 )}
 
-                {Boolean(order.pnbpPengawasanAmount) && (
+                {order.service === "Jasa PBM" && Boolean(order.pnbpPengawasanAmount) && (
                   <TR className="text-slate-600 hover:bg-transparent">
                     <TD className="py-2 px-3 font-sans italic">
                       Reimbursement: PNBP Pengawasan Bongkar Muat (@ Rp 54/MT)

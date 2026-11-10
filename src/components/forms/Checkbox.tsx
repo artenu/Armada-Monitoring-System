@@ -1,14 +1,5 @@
-import type { InputHTMLAttributes } from "react";
 import { cn } from "@/utils/cn";
-
-export interface CheckboxProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  "type"
-> {
-  label?: string;
-  description?: string;
-  card?: boolean;
-}
+import type { CheckboxProps } from "@/types/components/forms/formsTypes";
 
 export const Checkbox = ({
   label,

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
 import type { ApiFieldError, ApiErrorResponse } from "@/types/api";
 
 // Class kustom error penyeragam error API di seluruh frontend

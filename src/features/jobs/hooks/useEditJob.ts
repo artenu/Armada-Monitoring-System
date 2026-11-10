@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useOrderStore } from "@/stores/order-store";
 import {
@@ -20,13 +20,20 @@ export const useEditJob = () => {
   // Data master opsi (Customer, POL, POD, dll)
   const masterOptions = useMemo(() => loadJobMasterOptions(), []);
 
-  // State Berkas Dokumen Preview
-  const [previewUrl, setPreviewUrl] = useState<string>(
-    order?.spDocUrl || "/sample-sp.pdf",
-  );
-  const [previewName, setPreviewName] = useState<string>(
-    order?.spDocName || "SP_PBM_TB_KARYA_STAR_66_BG_SUMBER_SAMUDERA_01.pdf",
-  );
+  const initialDocUrl =
+    order?.spDocUrl ||
+    order?.rkbmSuratPenunjukanDocUrl ||
+    order?.rkbmSuratPermohonanDocUrl ||
+    order?.rkbmSuratPernyataanDocUrl ||
+    "";
+  const initialDocName =
+    order?.spDocName ||
+    order?.rkbmSuratPenunjukanDocName ||
+    order?.rkbmSuratPermohonanDocName ||
+    order?.rkbmSuratPernyataanDocName ||
+    (initialDocUrl ? "Dokumen_Order.pdf" : "Belum ada berkas terlampir");
+  const [previewUrl, setPreviewUrl] = useState<string>(initialDocUrl);
+  const [previewName, setPreviewName] = useState<string>(initialDocName);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,19 +44,28 @@ export const useEditJob = () => {
     }
   };
 
+  let initialTug = order?.tugBoat || "";
+  let initialBarge = order?.bargeNomination || "";
+  if (!initialTug && initialBarge.includes(" / ")) {
+    const parts = initialBarge.split(" / ");
+    initialTug = parts[0]?.trim() || "";
+    initialBarge = parts[1]?.trim() || "";
+  }
+
   // Form Management
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<OrderFormData>({
     resolver: yupResolver(orderSchema),
     values: order
       ? {
           customer: order.customer,
-          endUser: order.endUser,
-          vessel: order.vessel,
-          activityType: order.activityType,
+          endUser: order.endUser || "",
+          vessel: order.vessel || "",
+          activityType: order.activityType || "Domestik",
           service: order.service,
           pol: order.pol,
           pod: order.pod,
@@ -59,15 +75,33 @@ export const useEditJob = () => {
           ),
           customerPic: order.customerPic || "PIC Operasional",
           notes: order.notes || "",
+          shipmentType: order.shipmentType || "Batu Bara",
+          tugBoat: initialTug,
+          bargeNomination: initialBarge,
+          polJettyType: order.polJettyType || "Private",
+          rateType: order.rateType || "Contract",
+          includeCoo: order.includeCoo || false,
+          spotRateAmount: order.spotRateAmount
+            ? new Intl.NumberFormat("id-ID").format(order.spotRateAmount)
+            : "",
         }
       : undefined,
   });
 
+  const selectedService = useWatch({ control, name: "service" });
+  const selectedRateType = useWatch({ control, name: "rateType" });
+  const selectedIncludeCoo = useWatch({ control, name: "includeCoo" });
+
   const handleFormSubmit = (data: OrderFormData) => {
-    if (!order) return;
+    if (!order) {
+      return;
+    }
 
     void updateOrder(order.id, {
       vessel: data.vessel,
+      tugBoat: data.tugBoat,
+      bargeNomination: data.bargeNomination,
+      shipmentType: data.shipmentType,
       customer: data.customer,
       endUser: data.endUser,
       activityType: data.activityType as "Ekspor" | "Domestik" | "Impor",
@@ -79,6 +113,13 @@ export const useEditJob = () => {
       estimatedTonnage: Number(data.estimatedTonnage.replace(/\./g, "")) || 0,
       customerPic: data.customerPic,
       notes: data.notes,
+      // --- Teruskan data adaptif layanan ---
+      polJettyType: (data.polJettyType as "Private" | "Public") || "Private",
+      rateType: (data.rateType as "Contract" | "Spot") || "Contract",
+      includeCoo: Boolean(data.includeCoo),
+      spotRateAmount: data.spotRateAmount
+        ? Number(data.spotRateAmount.replace(/\./g, ""))
+        : undefined,
       spDocName: previewName,
       spDocUrl: previewUrl,
     });
@@ -88,7 +129,9 @@ export const useEditJob = () => {
   };
 
   const handleSendOps = () => {
-    if (!order) return;
+    if (!order) {
+      return;
+    }
     if (confirm(`Kirim order ${order.id} ke tim Operasional?`)) {
       void sendToOperational(order.id);
       navigate("/jobs");
@@ -109,6 +152,9 @@ export const useEditJob = () => {
     errors,
     handleFormSubmit,
     handleSendOps,
+    selectedService,
+    selectedRateType,
+    selectedIncludeCoo,
   };
 };
 

@@ -1,14 +1,7 @@
-import { useState, type InputHTMLAttributes } from "react";
-import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
-
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  startIcon?: LucideIcon;
-  badgeText?: string;
-}
+import type { InputProps } from "@/types/components/forms/formsTypes";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 export const Input = ({
   label,

@@ -11,7 +11,7 @@ export const NpwpPreviewModal = ({
   previewData,
   onClose,
 }: NpwpPreviewModalProps) => {
-  if (!previewData) return null;
+  if (!previewData) {return null;}
 
   return (
     <Modal

@@ -22,13 +22,13 @@ export const filterJobs = (
   orders: OrderItem[],
   searchQuery: string,
 ): OrderItem[] => {
-  if (!searchQuery.trim()) return orders;
+  if (!searchQuery.trim()) {return orders;}
   const q = searchQuery.toLowerCase();
 
   return orders.filter(
     (item) =>
       item.id.toLowerCase().includes(q) ||
-      item.vessel.toLowerCase().includes(q) ||
+      (item.vessel || "").toLowerCase().includes(q) ||
       item.customer.toLowerCase().includes(q) ||
       (item.bargeNomination || "").toLowerCase().includes(q),
   );
@@ -46,6 +46,12 @@ export const buildNewOrder = (
     rkbmDocUrl?: string;
     rkbmBongkarDocName?: string;
     rkbmBongkarDocUrl?: string;
+    rkbmSuratPenunjukanDocName?: string;
+    rkbmSuratPenunjukanDocUrl?: string;
+    rkbmSuratPermohonanDocName?: string;
+    rkbmSuratPermohonanDocUrl?: string;
+    rkbmSuratPernyataanDocName?: string;
+    rkbmSuratPernyataanDocUrl?: string;
   },
   orderCount: number,
 ): OrderItem => {
@@ -57,19 +63,27 @@ export const buildNewOrder = (
   return {
     id: `JOB-2026-${String(orderCount + 1).padStart(3, "0")}`,
     rkbmNo: "-",
-    vessel: data.vessel,
+    vessel: data.vessel || "",
     tugBoat: data.tugBoat,
     bargeNomination: armadaName,
-    shipmentType: data.shipmentType || "KS",
+    shipmentType: data.shipmentType || "Batu Bara",
     customer: data.customer,
-    endUser: data.endUser,
-    activityType: data.activityType as "Ekspor" | "Domestik" | "Impor",
+    endUser: data.endUser || "-",
+    activityType: (data.activityType || "Domestik") as "Ekspor" | "Domestik" | "Impor",
     service: data.service,
-    rkbmType: data.rkbmType as "Bongkar" | "Muat",
+    rkbmType: (data.rkbmType || "Muat") as "Bongkar" | "Muat",
     rkbmDocName: files.rkbmDocName,
     rkbmDocUrl: files.rkbmDocUrl,
     rkbmBongkarDocName: files.rkbmBongkarDocName,
     rkbmBongkarDocUrl: files.rkbmBongkarDocUrl,
+    rkbmSuratPenunjukanDocName: files.rkbmSuratPenunjukanDocName,
+    rkbmSuratPenunjukanDocUrl: files.rkbmSuratPenunjukanDocUrl,
+    rkbmSuratPermohonanDocName: files.rkbmSuratPermohonanDocName,
+    rkbmSuratPermohonanDocUrl: files.rkbmSuratPermohonanDocUrl,
+    rkbmSuratPernyataanDocName: files.rkbmSuratPernyataanDocName,
+    rkbmSuratPernyataanDocUrl: files.rkbmSuratPernyataanDocUrl,
+    includeCoo: data.includeCoo,
+    spotRateAmount: data.spotRateAmount ? Number(data.spotRateAmount) : undefined,
     spDocName: files.spDocName,
     spDocUrl: files.spDocUrl,
     pol: data.pol,

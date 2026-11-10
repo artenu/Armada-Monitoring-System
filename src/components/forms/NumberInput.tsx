@@ -1,7 +1,7 @@
 import { type ChangeEvent } from "react";
 import { cn } from "@/utils/cn";
 import { formatRibuan, parseRibuan } from "@/utils/formatters";
-import type { NumberInputProps } from "@/types/components/ui/NumberInput";
+import type { NumberInputProps } from "@/types/components/forms/formsTypes";
 
 export const NumberInput = ({
   label,

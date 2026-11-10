@@ -7,7 +7,8 @@ import {
   User as UserIcon,
   KeyRound,
 } from "lucide-react";
-import { Modal, Input, Select, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input, Select } from "@/components/forms";
 import type {
   ManagedUser,
   UserRole,
@@ -194,7 +195,7 @@ export const UserFormModal = ({
   onClose,
   onSave,
 }: UserFormModalProps) => {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <UserFormContent

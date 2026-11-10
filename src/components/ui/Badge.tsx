@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
+import type { OrderStatus } from "@/types/jobs/jobTypes";
 
 export type BadgeVariant =
   | "neutral"
@@ -71,3 +72,83 @@ export const Badge = ({
     </span>
   );
 };
+
+// =========================================================================
+// REUSABLE BADGE DOMAIN: SERVICE BADGE & STATUS BADGE
+// =========================================================================
+
+const getServiceBadgeVariant = (service?: string): BadgeVariant => {
+  switch (service) {
+    case "Jasa PBM":
+      return "purple";
+    case "Pengurusan RKBM":
+      return "warning";
+    case "Pengurusan Kepabeanan dan COO":
+      return "success";
+    default:
+      return "neutral";
+  }
+};
+
+const getStatusBadgeVariant = (status: OrderStatus | string): BadgeVariant => {
+  switch (status) {
+    case "Lunas":
+      return "success";
+    case "Siap Ditagihkan":
+    case "Menunggu Pembayaran":
+    case "Terkirim":
+    case "Diterima":
+      return "info";
+    case "Proses Muat":
+    case "Operational":
+      return "warning";
+    default:
+      return "neutral";
+  }
+};
+
+/**
+ * Reusable Badge untuk Layanan Order (PBM, RKBM, Kepabeanan & COO)
+ */
+export const ServiceBadge = ({
+  service,
+  size = "sm",
+  dot = false,
+  className,
+}: {
+  service?: string;
+  size?: "sm" | "md";
+  dot?: boolean;
+  className?: string;
+}) => (
+  <Badge
+    variant={getServiceBadgeVariant(service)}
+    size={size}
+    dot={dot}
+    className={className}>
+    {service || "Layanan Belum Ditentukan"}
+  </Badge>
+);
+
+/**
+ * Reusable Badge untuk Status Order (Lunas, Siap Ditagihkan, Proses Muat, dll)
+ */
+export const StatusBadge = ({
+  status,
+  size = "sm",
+  dot = true,
+  className,
+}: {
+  status: OrderStatus | string;
+  size?: "sm" | "md";
+  dot?: boolean;
+  className?: string;
+}) => (
+  <Badge
+    variant={getStatusBadgeVariant(status)}
+    size={size}
+    dot={dot}
+    className={className}>
+    {status}
+  </Badge>
+);

@@ -1,36 +1,41 @@
 import type { ValidateFilesParams } from "@/types";
 
 /**
- * Validasi keberadaan berkas wajib (Surat Penunjukan & Dokumen RKBM)
+ * Validasi keberadaan berkas wajib (Surat Penunjukan, 3 Dokumen KSOP untuk RKBM)
  */
 export const validateOrderFiles = ({
   data,
   spFile,
-  rkbmFile,
-  rkbmBongkarFile,
+  suratPenunjukanFile,
+  suratPermohonanFile,
+  suratPernyataanFile,
   isEdit,
 }: ValidateFilesParams): string | null => {
-  // 1. Surat Penunjukan (SI) wajib diunggah untuk order baru
-  if (!isEdit && !spFile) {
-    return "Surat Penunjukan (SI) wajib diunggah.";
+  // Jika sedang mode edit dan file tidak diganti, lewati validasi
+  if (isEdit) {
+    return null;
   }
 
-  // 2. Berkas RKBM wajib diunggah khusus layanan Pengurusan RKBM
-  if (data.service === "Pengurusan RKBM" && !isEdit) {
-    if (data.rkbmType === "Muat & Bongkar") {
-      if (!rkbmFile || !rkbmBongkarFile) {
-        return "Untuk opsi Muat & Bongkar, kedua berkas (RKBM Muat dan RKBM Bongkar) wajib diunggah.";
-      }
-    } else if (data.rkbmType === "Bongkar") {
-      if (!rkbmFile) {
-        return "File dokumen RKBM Bongkar wajib diunggah.";
-      }
-    } else {
-      if (!rkbmFile) {
-        return "File dokumen RKBM Muat wajib diunggah.";
-      }
+  // 1. Layanan Jasa PBM: Surat Penunjukan (SI) wajib diunggah
+  if (data.service === "Jasa PBM") {
+    if (!spFile) {
+      return "Surat Penunjukan (SI) wajib diunggah untuk layanan Jasa PBM.";
     }
   }
 
+  // 2. Layanan Pengurusan RKBM: 3 Dokumen Persyaratan KSOP wajib diunggah
+  if (data.service === "Pengurusan RKBM") {
+    if (!suratPenunjukanFile) {
+      return "Surat Penunjukan KSOP wajib diunggah untuk pengajuan RKBM.";
+    }
+    if (!suratPermohonanFile) {
+      return "Surat Permohonan KSOP wajib diunggah untuk pengajuan RKBM.";
+    }
+    if (!suratPernyataanFile) {
+      return "Surat Pernyataan KSOP wajib diunggah untuk pengajuan RKBM.";
+    }
+  }
+
+  // 3. Layanan Pengurusan Kepabeanan dan COO tidak membutuhkan berkas awal di tahap sales
   return null;
 };

@@ -28,7 +28,7 @@ export const useJobs = () => {
     const isConfirm = window.confirm(
       `Apakah Anda yakin ingin menghapus draft order ${orderId}? Data yang dihapus tidak dapat dikembalikan.`,
     );
-    if (!isConfirm) return;
+    if (!isConfirm) {return;}
     void deleteOrder(orderId);
   };
 
@@ -37,7 +37,7 @@ export const useJobs = () => {
     const isConfirm = window.confirm(
       `Apakah Anda yakin ingin mengirim order ${orderId} ke tim Operasional?`,
     );
-    if (!isConfirm) return;
+    if (!isConfirm) {return;}
     void sendToOperational(orderId);
   };
 

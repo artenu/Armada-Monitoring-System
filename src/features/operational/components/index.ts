@@ -5,3 +5,4 @@ export * from "./OperationalTable";
 export * from "./RkbmFleetSection";
 export * from "./RkbmSchedule";
 export * from "./RkbmChecklistSection";
+export * from "./OperationalFinanceTriggerSection";

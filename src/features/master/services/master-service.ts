@@ -13,7 +13,7 @@ const MASTER_STORAGE_KEY = "gds_master_data_v1";
 const getLocalMasterStore = (): Record<MasterResourceKey, MasterItem[]> => {
   try {
     const raw = localStorage.getItem(MASTER_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {return JSON.parse(raw);}
   } catch {
     // fallback
   }

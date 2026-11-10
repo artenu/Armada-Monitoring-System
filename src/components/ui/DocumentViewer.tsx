@@ -1,10 +1,10 @@
 import { FileText } from "lucide-react";
 import { cn } from "@/utils/cn";
-import type { DocumentViewerProps } from "@/types/components/ui/documentViewer";
+import type { DocumentViewerProps } from "@/types/components/ui/uiTypes";
 
 // Helper deteksi apakah format berkas berupa gambar
 const checkIsImage = (url?: string | null, fileName?: string): boolean => {
-  if (!url) return false;
+  if (!url) {return false;}
   const target = (fileName || url).toLowerCase();
   return (
     target.endsWith(".png") ||
