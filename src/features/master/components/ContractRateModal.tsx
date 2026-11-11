@@ -1,6 +1,7 @@
 import type { SubmitEvent } from "react";
 import { DollarSign } from "lucide-react";
-import { Modal, Input, NumberInput, Select, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input, NumberInput, Select } from "@/components/forms";
 import type {
   MasterItem,
   ContractRateFormData,
@@ -26,7 +27,7 @@ export const ContractRateModal = ({
   onSave,
   onClose,
 }: ContractRateModalProps) => {
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
     <Modal

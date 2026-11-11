@@ -1,9 +1,10 @@
-import type { OrderItem } from "@/types";
+import type { OrderItem, OrderStatus } from "@/types";
 
 export type OperationalTab = "all" | "pending_rkbm" | "loading" | "completed";
 
 export interface OperationalOrderFields {
   position?: string;
+  positionUpdatedAt?: string; // Tanggal & Jam (Datetime) update posisi armada
   etaPol?: string;
   etaPod?: string;
   etaJetty?: string;
@@ -17,12 +18,40 @@ export interface OperationalOrderFields {
   finalDsr?: number;
   operationalNotes?: string;
 
-  // Checkbox Dokumen
+  // Tanggal Mulai Commenced (Komen Slot) & Completed
+  commencedDate?: string;
+  completedDate?: string;
+
+  // Checkbox Dokumen Operasional
   hasSkab?: boolean;
   hasSkb?: boolean;
   hasRoyalty?: boolean;
   hasLhv?: boolean;
-  hasBo?: boolean;
+  hasBo?: boolean; // Booking Order BUP
+
+  // Dokumen Trigger Finance - RKBM (File SK RKBM Muat / Bongkar Terbit)
+  rkbmMuatDocName?: string;
+  rkbmMuatDocUrl?: string;
+  rkbmBongkarDocName?: string;
+  rkbmBongkarDocUrl?: string;
+
+  // Dokumen Trigger Finance - Jasa PBM (5 Dokumen Wajib Siap Finance)
+  sofDocName?: string;
+  sofDocUrl?: string;
+  fenderDocName?: string;
+  fenderDocUrl?: string;
+  staleweightDocName?: string;
+  staleweightDocUrl?: string;
+  finalDsrDocName?: string;
+  finalDsrDocUrl?: string;
+  noDamageDocName?: string;
+  noDamageDocUrl?: string;
+
+  // Dokumen Trigger Finance - Kepabeanan & COO
+  pebDocName?: string;
+  pebDocUrl?: string;
+  cooDocName?: string;
+  cooDocUrl?: string;
 
   // Berkas lama (opsional transisi)
   skabFileName?: string;
@@ -45,6 +74,7 @@ export interface OperationalOrderFields {
 
 export interface OperationalUpdatePayload {
   position: string;
+  positionUpdatedAt?: string;
   etaPol?: string;
   etaPod?: string;
   etaJetty?: string;
@@ -53,15 +83,17 @@ export interface OperationalUpdatePayload {
   vesselCompleteDate?: string;
   finalDsr?: number;
   operationalNotes?: string;
+  commencedDate?: string;
+  completedDate?: string;
   hasSkab?: boolean;
   hasSkb?: boolean;
   hasRoyalty?: boolean;
   hasLhv?: boolean;
+  hasBo?: boolean;
   loadingStartDate?: string;
   loadingEndDate?: string;
   dischargeStartDate?: string;
   dischargeEndDate?: string;
-  hasBo?: boolean;
   lhvStatus?: string;
   boStatus?: string;
   rkbmNo?: string;
@@ -69,6 +101,30 @@ export interface OperationalUpdatePayload {
   agent?: string;
   bargeNomination?: string;
   shipmentType?: string;
+  status?: OrderStatus;
+
+  // Dokumen Trigger Finance
+  rkbmMuatDocName?: string;
+  rkbmMuatDocUrl?: string;
+  rkbmBongkarDocName?: string;
+  rkbmBongkarDocUrl?: string;
+
+  sofDocName?: string;
+  sofDocUrl?: string;
+  fenderDocName?: string;
+  fenderDocUrl?: string;
+  staleweightDocName?: string;
+  staleweightDocUrl?: string;
+  finalDsrDocName?: string;
+  finalDsrDocUrl?: string;
+  noDamageDocName?: string;
+  noDamageDocUrl?: string;
+
+  pebDocName?: string;
+  pebDocUrl?: string;
+  cooDocName?: string;
+  cooDocUrl?: string;
+
   skabFileName?: string;
   skabFileUrl?: string;
   skbFileName?: string;
@@ -135,6 +191,12 @@ export interface RkbmScheduleSectionProps {
   position: string;
   onPositionChange: (val: string) => void;
   positionOptions: Array<{ label: string; value: string }>;
+  positionUpdatedAt?: string;
+  onPositionUpdatedAtChange?: (val: string) => void;
+  commencedDate?: string;
+  onCommencedDateChange?: (val: string) => void;
+  completedDate?: string;
+  onCompletedDateChange?: (val: string) => void;
   etaPol: string;
   onEtaPolChange: (val: string) => void;
   etaPod: string;

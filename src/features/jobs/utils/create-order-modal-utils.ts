@@ -16,9 +16,9 @@ export const getDefaultOrderFormValues = (
   if (initialData) {
     return {
       customer: initialData.customer,
-      endUser: initialData.endUser,
-      vessel: initialData.vessel,
-      activityType: initialData.activityType,
+      endUser: initialData.endUser || "",
+      vessel: initialData.vessel || "",
+      activityType: initialData.activityType || "Domestik",
       service: initialData.service,
       pol: initialData.pol,
       pod: initialData.pod,
@@ -30,13 +30,17 @@ export const getDefaultOrderFormValues = (
       notes: initialData.notes || "",
       tugBoat: initialData.tugBoat || "",
       bargeNomination: initialData.bargeNomination || "",
-      shipmentType: initialData.shipmentType || "KS",
+      shipmentType: initialData.shipmentType || "Batu Bara",
       rkbmType: initialData.rkbmType || "Muat",
       kegiatanLokasi: initialData.kegiatanLokasi || "Muara Berau",
       polJettyType: initialData.polJettyType || "Private",
       rateType: initialData.rateType || "Contract",
       customRatePerTon: initialData.customRatePerTon
         ? String(initialData.customRatePerTon)
+        : "",
+      includeCoo: initialData.includeCoo ?? false,
+      spotRateAmount: initialData.spotRateAmount
+        ? String(initialData.spotRateAmount)
         : "",
     };
   }
@@ -55,12 +59,14 @@ export const getDefaultOrderFormValues = (
     notes: "",
     tugBoat: "",
     bargeNomination: "",
-    shipmentType: "KS",
+    shipmentType: "Batu Bara",
     rkbmType: "Muat",
     kegiatanLokasi: "Muara Berau",
     polJettyType: "Private",
     rateType: "Contract",
     customRatePerTon: "",
+    includeCoo: false,
+    spotRateAmount: "",
   };
 };
 
@@ -71,6 +77,9 @@ export const buildOrderFilesPayload = ({
   spFile,
   rkbmFile,
   rkbmBongkarFile,
+  suratPenunjukanFile,
+  suratPermohonanFile,
+  suratPernyataanFile,
   initialData,
 }: BuildFilesParams): CreateOrderModalFiles => {
   return {
@@ -86,6 +95,25 @@ export const buildOrderFilesPayload = ({
     rkbmBongkarDocUrl: rkbmBongkarFile
       ? URL.createObjectURL(rkbmBongkarFile)
       : initialData?.rkbmBongkarDocUrl,
+    // 3 Dokumen Persyaratan KSOP untuk RKBM
+    rkbmSuratPenunjukanDocName: suratPenunjukanFile
+      ? suratPenunjukanFile.name
+      : initialData?.rkbmSuratPenunjukanDocName,
+    rkbmSuratPenunjukanDocUrl: suratPenunjukanFile
+      ? URL.createObjectURL(suratPenunjukanFile)
+      : initialData?.rkbmSuratPenunjukanDocUrl,
+    rkbmSuratPermohonanDocName: suratPermohonanFile
+      ? suratPermohonanFile.name
+      : initialData?.rkbmSuratPermohonanDocName,
+    rkbmSuratPermohonanDocUrl: suratPermohonanFile
+      ? URL.createObjectURL(suratPermohonanFile)
+      : initialData?.rkbmSuratPermohonanDocUrl,
+    rkbmSuratPernyataanDocName: suratPernyataanFile
+      ? suratPernyataanFile.name
+      : initialData?.rkbmSuratPernyataanDocName,
+    rkbmSuratPernyataanDocUrl: suratPernyataanFile
+      ? URL.createObjectURL(suratPernyataanFile)
+      : initialData?.rkbmSuratPernyataanDocUrl,
   };
 };
 
@@ -97,7 +125,7 @@ export const computePnbpPreview = (
   rawTonnage?: string,
 ) => {
   const numTonnage = Number((rawTonnage || "").replace(/\./g, "")) || 0;
-  if (numTonnage <= 0) return null;
+  if (numTonnage <= 0) {return null;}
   return calculatePnbp(
     (activityType as "Ekspor" | "Domestik" | "Impor") || "Domestik",
     numTonnage,

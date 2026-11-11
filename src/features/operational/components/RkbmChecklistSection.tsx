@@ -1,5 +1,6 @@
 import { CheckSquare } from "lucide-react";
-import { Badge, Checkbox } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Checkbox } from "@/components/forms";
 import { buildChecklistItems } from "../utils/operational-utils";
 import type { RkbmChecklistSectionProps } from "@/types";
 

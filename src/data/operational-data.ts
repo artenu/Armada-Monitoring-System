@@ -76,7 +76,7 @@ export const OPERATIONAL_DOCUMENTS_CONFIG: OperationalDocumentConfig[] = [
   {
     key: "hasBo",
     id: "chk-bo",
-    label: "Bunker Order (BO)",
-    description: "Pemberitahuan Bunker",
+    label: "Booking Order BUP",
+    description: "Pemesanan Jasa Pelabuhan BUP",
   },
 ];

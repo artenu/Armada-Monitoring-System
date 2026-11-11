@@ -1,6 +1,7 @@
 import { useState, type SubmitEvent } from "react";
 import { CheckCircle2, Calendar } from "lucide-react";
-import { Modal, Input, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input } from "@/components/forms";
 import { formatRupiah } from "@/utils/formatters";
 import type { ConfirmPaymentModalProps } from "@/types";
 

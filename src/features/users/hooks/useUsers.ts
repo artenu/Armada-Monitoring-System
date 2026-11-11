@@ -43,7 +43,7 @@ export const useUsers = () => {
   // Filter Data Staf
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
-      if (activeTab === "nonaktif" && u.status !== "Nonaktif") return false;
+      if (activeTab === "nonaktif" && u.status !== "Nonaktif") {return false;}
       if (
         activeTab !== "all" &&
         activeTab !== "nonaktif" &&

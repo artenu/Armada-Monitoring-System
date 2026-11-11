@@ -45,7 +45,7 @@ export const useOperational = () => {
   ) => {
     void updateOrder(orderId, {
       ...payload,
-      status: "Proses Muat",
+      status: payload.status || "Proses Muat",
     });
   };
 

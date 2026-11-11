@@ -21,11 +21,11 @@ export const Navbar = () => {
 
   // Otomatis tentukan label judul breadcrumb dari rute aktif
   const getPageTitle = (pathname: string) => {
-    if (pathname.includes("jobs")) return "Job Sales";
-    if (pathname.includes("operational")) return "Job Operational";
-    if (pathname.includes("billing")) return "Job Finance";
-    if (pathname.includes("documents")) return "Checklist Dokumen";
-    if (pathname.includes("users")) return "User Management";
+    if (pathname.includes("jobs")) {return "Job Sales";}
+    if (pathname.includes("operational")) {return "Job Operational";}
+    if (pathname.includes("billing")) {return "Job Finance";}
+    if (pathname.includes("documents")) {return "Checklist Dokumen";}
+    if (pathname.includes("users")) {return "User Management";}
     return "Dashboard";
   };
 

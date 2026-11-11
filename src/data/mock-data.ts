@@ -9,10 +9,16 @@ export const SERVICE_OPTIONS = [
 
 export const CUSTOMER_OPTIONS = [
   "PT Alfara Delta Persada",
-  "PT Lintas Samudera Energi",
-  "PT Borneo Energy Terminal",
+  "Armada Maritim Perkasa",
+  "Christian Eka Pratama",
 ];
-export const END_USER_OPTIONS = ["PLTU Muara Jawa", "PLTU Paiton"];
+
+export const END_USER_OPTIONS = [
+  "Christian eka pratama",
+  "PT. Kedap Sayap",
+  "PT. Mareta Persada",
+  "PT. Maharaja Mineral",
+];
 
 export const POL_OPTIONS = [
   "Muara Berau",
@@ -106,3 +112,10 @@ export const OPERATIONAL_STATUS_PRESETS = [
   "Stanby pangkalan",
   "Sailing to muara",
 ] as const;
+
+export const SHIPMENT_CATEGORY_OPTIONS = [
+  "Batu Bara",
+  "Batu Split",
+  "Alat Berat",
+] as const;
+export type ShipmentCategory = (typeof SHIPMENT_CATEGORY_OPTIONS)[number];

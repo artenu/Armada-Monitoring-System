@@ -1,6 +1,7 @@
 import { useState, type SubmitEvent } from "react";
 import { Calendar, CheckCircle2, Scale, AlertCircle } from "lucide-react";
-import { Modal, Input, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input } from "@/components/forms";
 import type { OrderItem } from "@/types";
 
 export interface CompleteLoadingModalProps {
@@ -95,7 +96,7 @@ const CompleteLoadingForm = ({
           value={completeDate}
           onChange={(e) => {
             setCompleteDate(e.target.value);
-            if (errorMessage) setErrorMessage(null);
+            if (errorMessage) {setErrorMessage(null);}
           }}
         />
 
@@ -109,7 +110,7 @@ const CompleteLoadingForm = ({
           value={finalDsr}
           onChange={(e) => {
             setFinalDsr(e.target.value);
-            if (errorMessage) setErrorMessage(null);
+            if (errorMessage) {setErrorMessage(null);}
           }}
           helperText={`Estimasi awal dari Sales: ${order.estimatedTonnage?.toLocaleString("id-ID")} MT`}
         />
@@ -134,7 +135,7 @@ export const CompleteLoadingModal = ({
   onClose,
   onComplete,
 }: CompleteLoadingModalProps) => {
-  if (!isOpen || !order) return null;
+  if (!isOpen || !order) {return null;}
 
   return (
     <CompleteLoadingForm

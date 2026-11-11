@@ -4,7 +4,7 @@ import type { UseEditJobReturn } from "@/features/jobs/hooks/useEditJob";
 
 export const EditJobHeader = ({ state }: { state: UseEditJobReturn }) => {
   const { order, isEditable, navigate, handleSendOps } = state;
-  if (!order) return null;
+  if (!order) {return null;}
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs">

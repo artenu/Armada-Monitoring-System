@@ -1,5 +1,6 @@
 import { Lock, Phone, Building2 } from "lucide-react";
-import { Input, Select, Badge } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Input, Select } from "@/components/forms";
 import type { RkbmFleetSectionProps } from "@/types";
 
 export const RkbmFleetSection = ({
@@ -10,6 +11,10 @@ export const RkbmFleetSection = ({
   onAgentChange,
   agentOptions,
 }: RkbmFleetSectionProps) => {
+  const isRkbm = order.service === "Pengurusan RKBM";
+  const isPbm = order.service === "Jasa PBM";
+  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
+
   return (
     <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
       <div className="border-l-4 border-slate-700 px-4 py-2.5 bg-slate-50/80 flex items-center justify-between">
@@ -22,18 +27,18 @@ export const RkbmFleetSection = ({
         <Badge variant="neutral">Terkunci (Read-Only)</Badge>
       </div>
 
-      <div className="p-4 grid grid-cols-2 sm:grid-cols-5 gap-3 border-t border-slate-100 text-xs">
+      <div className="p-4 grid grid-cols-4 gap-3 border-t border-slate-100 text-xs text-start">
         {/* Cirian Jenis Layanan Order */}
         <div>
           <span className="text-slate-400 block text-[10.5px]">
             Layanan Order:
           </span>
           <span className="mt-1 block">
-            {order.service === "Jasa PBM" ? (
+            {isPbm ? (
               <Badge variant="success" size="sm" dot>
                 Jasa PBM
               </Badge>
-            ) : order.service === "Pengurusan RKBM" ? (
+            ) : isRkbm ? (
               <Badge variant="warning" size="sm" dot>
                 Pengurusan RKBM
               </Badge>
@@ -50,7 +55,7 @@ export const RkbmFleetSection = ({
             Nama Kapal / Tug Boat:
           </span>
           <span className="font-bold text-slate-800">
-            {order.service === "Jasa PBM"
+            {isPbm
               ? "-"
               : order.tugBoat ||
                 order.bargeNomination?.split("/")[0]?.trim() ||
@@ -63,7 +68,7 @@ export const RkbmFleetSection = ({
             Barge (Tongkang):
           </span>
           <span className="font-bold text-slate-800">
-            {order.service === "Jasa PBM"
+            {isPbm
               ? "-"
               : order.bargeNomination?.includes("/")
                 ? order.bargeNomination.split("/")[1]?.trim()
@@ -75,36 +80,35 @@ export const RkbmFleetSection = ({
           <span className="text-slate-400 block text-[10.5px]">
             Mother Vessel:
           </span>
-          <span className="font-bold text-slate-800">{order.vessel}</span>
-        </div>
-
-        <div>
-          <span className="text-slate-400 block text-[10.5px]">
-            Shipment / Rute:
-          </span>
           <span className="font-bold text-slate-800">
-            {order.shipmentType || "KS"} • {order.pol} → {order.pod}
+            {order.vessel || "-"}
           </span>
         </div>
       </div>
 
-      {/* Input Tambahan Koordinasi Lapangan */}
-      <div className="p-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100">
-        <Input
-          label="No. HP Kapten"
-          startIcon={Phone}
-          placeholder="0812-xxxx-xxxx"
-          value={captainPhone}
-          onChange={(e) => onCaptainPhoneChange(e.target.value)}
-        />
-        <Select
-          label="Agen Kapal (Master Data)"
-          startIcon={Building2}
-          value={agent}
-          onChange={(e) => onAgentChange(e.target.value)}
-          options={agentOptions}
-        />
-      </div>
+      {/* Input Tambahan Koordinasi Lapangan:
+          - Sembunyikan sepenuhnya untuk Kepabeanan & COO
+          - Hapus No. HP Kapten untuk Jasa PBM */}
+      {!isCustoms && (
+        <div className="p-4 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100">
+          {!isPbm && (
+            <Input
+              label="No. HP Kapten"
+              startIcon={Phone}
+              placeholder="0812-xxxx-xxxx"
+              value={captainPhone}
+              onChange={(e) => onCaptainPhoneChange(e.target.value)}
+            />
+          )}
+          <Select
+            label="Agen Kapal (Master Data)"
+            startIcon={Building2}
+            value={agent}
+            onChange={(e) => onAgentChange(e.target.value)}
+            options={agentOptions}
+          />
+        </div>
+      )}
     </div>
   );
 };

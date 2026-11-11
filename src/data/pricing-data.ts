@@ -8,81 +8,42 @@ export const CONTRACT_RATES_STORAGE_KEY = "gds_contract_rates_v1";
 export const CONTRACT_RATES_DATABASE: CustomerContractRate[] = [
   {
     id: "RATE-001",
-    customerId: "CEP",
-    customerName: "CEP",
-    pbmRatePerTon: 250, // 250 rupiah/MT
-    rkbmBongkarFee: 500000, // 500 ribu per dokumen
-    rkbmMuatPrivateFee: 0, // Free di Private Jetty
-    rkbmMuatPublicFee: 350000, // 350 ribu jika Public Jetty
-    kepabeananFee: 0,
-    cooFee: 0,
-    status: "Aktif",
-    notes: "Kontrak Resmi MOM 5 Nov 2026",
-  },
-  {
-    id: "RATE-002",
     customerId: "ALFARA",
     customerName: "PT Alfara Delta Persada",
     pbmRatePerTon: 490, // 490 rupiah/MT
     rkbmBongkarFee: 0,
     rkbmMuatPrivateFee: 0,
     rkbmMuatPublicFee: 350000,
-    kepabeananFee: 0,
-    cooFee: 0,
+    kepabeananFee: 12000000, // 12 Juta (Sesuai MOM)
+    cooFee: 2000000, // 2 Juta (Sesuai MOM)
     status: "Aktif",
-    notes: "Kontrak Resmi MOM 5 Nov 2026",
+    notes: "Kepabeanan 12jt, COO 2jt MOM 7 Nov 2026",
+  },
+  {
+    id: "RATE-002",
+    customerId: "AMP",
+    customerName: "Armada Maritim Perkasa",
+    pbmRatePerTon: 0,
+    rkbmBongkarFee: 0,
+    rkbmMuatPrivateFee: 0,
+    rkbmMuatPublicFee: 0,
+    kepabeananFee: 10000000, // 10 Juta (Sesuai MOM)
+    cooFee: 0, // Belum diketahui / TBD (Sesuai MOM)
+    status: "Aktif",
+    notes: "Kepabeanan 10jt, COO TBD MOM 7 Nov 2026",
   },
   {
     id: "RATE-003",
-    customerId: "AMP",
-    customerName: "PT Antara Multi Perkasa",
-    pbmRatePerTon: 0,
-    rkbmBongkarFee: 0,
-    rkbmMuatPrivateFee: 0,
-    rkbmMuatPublicFee: 0,
-    kepabeananFee: 10000000, // 10 juta flat / dokumen
-    cooFee: 0, // Sudah include
-    status: "Aktif",
-    notes: "Flat paket Kepabeanan & COO MOM 5 Nov 2026",
-  },
-  {
-    id: "RATE-004",
-    customerId: "ALFA_ENERGY",
-    customerName: "Alfa Energy",
-    pbmRatePerTon: 0,
-    rkbmBongkarFee: 0,
-    rkbmMuatPrivateFee: 0,
-    rkbmMuatPublicFee: 0,
-    kepabeananFee: 12000000, // 12 juta / dokumen
-    cooFee: 2000000, // 2 juta / dokumen
-    status: "Aktif",
-    notes: "Kepabeanan 12jt, COO 2jt MOM 5 Nov 2026",
-  },
-  {
-    id: "RATE-005",
-    customerId: "LSE",
-    customerName: "PT Lintas Samudera Energi",
-    pbmRatePerTon: 300,
-    rkbmBongkarFee: 500000,
-    rkbmMuatPrivateFee: 0,
-    rkbmMuatPublicFee: 350000,
+    customerId: "CEP",
+    customerName: "Christian Eka Pratama",
+    pbmRatePerTon: 250, // 250 rupiah/MT
+    rkbmBongkarFee: 500000, // 500 ribu
+    rkbmMuatPrivateFee: 0, // Free di Private Jetty
+    rkbmMuatPublicFee: 350000, // 350 ribu di Public Jetty
     kepabeananFee: 0,
     cooFee: 0,
     status: "Aktif",
-    notes: "Tarif Standar Operasional LSE",
-  },
-  {
-    id: "RATE-006",
-    customerId: "BET",
-    customerName: "PT Borneo Energy Terminal",
-    pbmRatePerTon: 350,
-    rkbmBongkarFee: 500000,
-    rkbmMuatPrivateFee: 0,
-    rkbmMuatPublicFee: 350000,
-    kepabeananFee: 0,
-    cooFee: 0,
-    status: "Aktif",
-    notes: "Tarif Standar Operasional BET",
+    notes: "PBM 250/MT, RKBM Bongkar 500rb, Muat Public 350rb MOM 7 Nov 2026",
   },
 ];
 

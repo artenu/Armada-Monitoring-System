@@ -22,10 +22,10 @@ export const LoginPage = () => {
           />
           <div>
             <span className="font-bold text-xl tracking-tight text-white block">
-              GDS SYSTEM
+              Armada Monitoring
             </span>
             <span className="text-[11px] uppercase tracking-widest text-red-400 font-semibold">
-              Gapura Dermaga Samudera
+              Armada Monitoring System
             </span>
           </div>
         </div>
@@ -34,7 +34,7 @@ export const LoginPage = () => {
         <div className="relative z-10 my-auto py-12 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-950/60 border border-red-800/40 text-red-300 text-xs font-medium mb-6">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            Sistem Informasi Operasional PBM Terpadu
+            Sistem Informasi Operasional PBM, RKBM & Kepabeanan
           </div>
 
           <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -44,8 +44,8 @@ export const LoginPage = () => {
 
           <p className="mt-5 text-slate-400 text-base leading-relaxed">
             Platform terpadu untuk monitoring pergerakan tongkang batubara,
-            pengurusan dokumen izin RKBM Muat dan Bongkar, alokasi TKBM, serta
-            pengarsipan digital Sucofindo.
+            pengurusan izin dokumen RKBM Muat dan Bongkar, jasa PBM, serta
+            kepabeanan dan COO.
           </p>
 
           {/* 3 Keunggulan Fitur Sistem */}
@@ -118,10 +118,10 @@ export const LoginPage = () => {
             />
             <div>
               <span className="font-bold text-lg text-slate-900 leading-tight block">
-                GDS SYSTEM
+                Armada Monitoring
               </span>
               <span className="text-[10px] text-red-600 font-semibold tracking-wider uppercase">
-                PT Gapura Segara Borneo
+                Armada Monitoring System
               </span>
             </div>
           </div>

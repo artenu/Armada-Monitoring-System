@@ -77,14 +77,14 @@ export const filterOperationalOrders = (
     const isLoading = isOperationalLoading(order);
     const isCompleted = isOperationalCompleted(order);
 
-    if (activeTab === "pending_rkbm" && !isPending) return false;
-    if (activeTab === "loading" && !isLoading) return false;
-    if (activeTab === "completed" && !isCompleted) return false;
+    if (activeTab === "pending_rkbm" && !isPending) {return false;}
+    if (activeTab === "loading" && !isLoading) {return false;}
+    if (activeTab === "completed" && !isCompleted) {return false;}
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       const matchId = order.id.toLowerCase().includes(query);
-      const matchVessel = order.vessel.toLowerCase().includes(query);
+      const matchVessel = (order.vessel || "").toLowerCase().includes(query);
       const matchArmada = (order.bargeNomination || "")
         .toLowerCase()
         .includes(query);

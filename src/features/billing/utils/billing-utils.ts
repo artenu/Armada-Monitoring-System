@@ -86,10 +86,10 @@ export const filterBillingOrders = (
     const isReceived = o.status === "Diterima";
     const isPaid = o.status === "Lunas";
 
-    if (activeTab === "ready_to_bill" && !isReadyToBill) return false;
-    if (activeTab === "sent" && !isSent) return false;
-    if (activeTab === "received" && !isReceived) return false;
-    if (activeTab === "paid" && !isPaid) return false;
+    if (activeTab === "ready_to_bill" && !isReadyToBill) {return false;}
+    if (activeTab === "sent" && !isSent) {return false;}
+    if (activeTab === "received" && !isReceived) {return false;}
+    if (activeTab === "paid" && !isPaid) {return false;}
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();

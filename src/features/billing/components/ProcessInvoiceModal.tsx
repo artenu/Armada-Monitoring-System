@@ -1,5 +1,6 @@
 import { Receipt, Send } from "lucide-react";
-import { Modal, Input, NumberInput, Checkbox, Button } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
+import { Input, NumberInput, Checkbox } from "@/components/forms";
 import { formatRupiah } from "@/utils/formatters";
 import type { ProcessInvoiceModalProps } from "@/types";
 import { useProcessInvoiceModal } from "../hooks/useProcessInvoiceModal";

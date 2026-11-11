@@ -1,10 +1,13 @@
 export * from "./Button";
 export * from "./Badge";
-export * from "./Input";
-export * from "./Select";
 export * from "./KpiCard";
 export * from "./Modal";
 export * from "./Table";
-export * from "./NumberInput";
 export * from "./DocumentViewer";
-export * from "./Checkbox";
+export * from "./Card";
+export * from "./StatCard";
+export * from "./Spinner";
+
+// Also re-export form controls for backwards compatibility
+export * from "../forms";
+

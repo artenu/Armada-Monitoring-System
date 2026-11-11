@@ -154,7 +154,7 @@ export const Sidebar = () => {
                 ARMADA
               </span>
               <span className="text-[11px] text-slate-400 font-medium">
-                RKBM Archive System
+                Monitoring System
               </span>
             </div>
           </div>
