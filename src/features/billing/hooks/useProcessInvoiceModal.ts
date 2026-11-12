@@ -1,6 +1,11 @@
-import { useState, useMemo, type SubmitEvent } from "react";
+import { useState, useMemo, type SubmitEvent, type ChangeEvent } from "react";
 import type { ProcessInvoiceModalProps } from "@/types";
 import { getContractRateByCustomer, calculatePnbp } from "@/data/pricing-data";
+import {
+  isPbmService,
+  isRkbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 export const useProcessInvoiceModal = ({
   order,
@@ -15,26 +20,49 @@ export const useProcessInvoiceModal = ({
     return getContractRateByCustomer(order.customer);
   }, [order.customer]);
 
-  const isPbm = order.service === "Jasa PBM";
-  const isRkbm = order.service === "Pengurusan RKBM";
-  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
+  const isPbm = isPbmService(order.service);
+  const isRkbm = isRkbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
 
-  // 3. Default Tarif Satuan PBM
-  const defaultRate = useMemo(() => {
-    if (!isPbm) {return 0;}
+  // 3. Kalkulasi Otomatis di Belakang Layar (Tanpa Input Manual)
+  // A. Tarif Satuan PBM
+  const ratePerTon = useMemo(() => {
+    if (!isPbm) {
+      return 0;
+    }
     if (order.rateType === "Spot" && order.customRatePerTon) {
       return order.customRatePerTon;
+    }
+    // Jika BUP PTB di Muara Berau -> Rp 11.000 / MT sesuai MOM 11 Nov 2026
+    if (order.customer.includes("PTB") || order.customer.includes("BUP")) {
+      return contract?.pbmRatePerTon || 11000;
     }
     if (contract?.pbmRatePerTon) {
       return contract.pbmRatePerTon;
     }
     return order.ratePerTon || 0;
-  }, [isPbm, order.rateType, order.customRatePerTon, contract, order.ratePerTon]);
+  }, [
+    isPbm,
+    order.rateType,
+    order.customRatePerTon,
+    order.customer,
+    contract,
+    order.ratePerTon,
+  ]);
 
-  // 4. Default Fee RKBM
-  const defaultRkbmFee = useMemo(() => {
-    if (!isRkbm) {return 0;}
-    if (order.rkbmFee !== undefined) {return order.rkbmFee;}
+  // B. Subtotal Jasa PBM
+  const jasaPbm = useMemo(() => {
+    return Math.round(tonase * ratePerTon);
+  }, [tonase, ratePerTon]);
+
+  // C. Fee RKBM
+  const rkbmFee = useMemo(() => {
+    if (!isRkbm) {
+      return 0;
+    }
+    if (order.rkbmFee !== undefined) {
+      return order.rkbmFee;
+    }
 
     const muatFee =
       order.polJettyType === "Private"
@@ -49,31 +77,61 @@ export const useProcessInvoiceModal = ({
       return muatFee + bongkarFee;
     }
     return muatFee;
-  }, [
-    isRkbm,
-    order.rkbmFee,
-    order.rkbmType,
-    order.polJettyType,
-    contract,
-  ]);
+  }, [isRkbm, order.rkbmFee, order.rkbmType, order.polJettyType, contract]);
 
-  // 5. Default Fee Kepabeanan & COO
-  const defaultKepabeananFee = useMemo(() => {
-    if (!isCustoms) {return 0;}
+  // D. Fee Kepabeanan & COO
+  const kepabeananFee = useMemo(() => {
+    if (!isCustoms) {
+      return 0;
+    }
     if (order.rateType === "Spot" && order.spotRateAmount) {
       return order.spotRateAmount;
     }
-    return contract?.kepabeananFee ?? (order.customer.includes("Alfara") ? 12000000 : 10000000);
-  }, [isCustoms, order.rateType, order.spotRateAmount, contract, order.customer]);
+    return (
+      contract?.kepabeananFee ??
+      (order.customer.includes("ADP") || order.customer.includes("Alfara")
+        ? 12000000
+        : 10000000)
+    );
+  }, [
+    isCustoms,
+    order.rateType,
+    order.spotRateAmount,
+    contract,
+    order.customer,
+  ]);
 
-  const defaultCooFee = useMemo(() => {
-    if (!isCustoms || !order.includeCoo) {return 0;}
+  const cooFee = useMemo(() => {
+    if (!isCustoms || !order.includeCoo) {
+      return 0;
+    }
     return contract?.cooFee ?? 2000000;
   }, [isCustoms, order.includeCoo, contract]);
 
-  // 6. Default PNBP Reimbursement Sesuai MOM (700/350 & 54) - Hanya untuk PBM
+  // E. Subtotal Seluruh Jasa (DPP)
+  const subtotalJasa = useMemo(() => {
+    if (isPbm) {
+      return jasaPbm;
+    }
+    if (isRkbm) {
+      return rkbmFee;
+    }
+    if (isCustoms) {
+      return kepabeananFee + cooFee;
+    }
+    return 0;
+  }, [isPbm, jasaPbm, isRkbm, rkbmFee, isCustoms, kepabeananFee, cooFee]);
+
+  // F. PPN 11% Otomatis Diproses di Belakang Layar
+  const ppn = useMemo(() => {
+    return Math.round(subtotalJasa * 0.11);
+  }, [subtotalJasa]);
+
+  // G. PNBP Reimbursement Otomatis (Gratis untuk PT BUP PTB)
+  const isPnbpGratis =
+    contract?.pnbpBarangType === "Gratis" || order.customer.includes("PTB");
   const pnbpCalc = useMemo(() => {
-    if (!isPbm) {
+    if (!isPbm || isPnbpGratis) {
       return {
         rateBarang: 0,
         pnbpBarang: 0,
@@ -83,9 +141,12 @@ export const useProcessInvoiceModal = ({
       };
     }
     return calculatePnbp(order.activityType || "Domestik", tonase);
-  }, [isPbm, order.activityType, tonase]);
+  }, [isPbm, isPnbpGratis, order.activityType, tonase]);
 
-  // 7. State Form Administrasi Invoice
+  const totalPnbp = pnbpCalc.totalPnbp;
+  const grandTotal = subtotalJasa + ppn + totalPnbp;
+
+  // 4. State Administrasi Nomor Invoice & Upload Berkas
   const [invoiceNo, setInvoiceNo] = useState(
     order.invoiceNo ||
       `INV/2026/${order.id.replace(/\D/g, "").slice(-4).padStart(4, "0")}/AMP`,
@@ -94,50 +155,37 @@ export const useProcessInvoiceModal = ({
     order.invoiceDate || new Date().toISOString().split("T")[0],
   );
   const [dueDate, setDueDate] = useState(() => {
-    if (order.dueDate) {return order.dueDate;}
+    if (order.dueDate) {
+      return order.dueDate;
+    }
     const target = new Date();
     target.setDate(target.getDate() + 14);
     return target.toISOString().split("T")[0];
   });
 
-  // 8. State Nilai Tagihan Jasa & Reimbursement
-  const [ratePerTon, setRatePerTon] = useState<number>(defaultRate);
-  const [rkbmFee, setRkbmFee] = useState<number>(defaultRkbmFee);
-  const [kepabeananFee, setKepabeananFee] = useState<number>(defaultKepabeananFee);
-  const [cooFee, setCooFee] = useState<number>(defaultCooFee);
-  const [includePpn, setIncludePpn] = useState<boolean>(true);
-  const [pnbpBarang, setPnbpBarang] = useState<number>(
-    order.pnbpBarangAmount !== undefined
-      ? order.pnbpBarangAmount
-      : pnbpCalc.pnbpBarang,
+  // State Berkas Invoice yang Diunggah
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [invoiceDocUrl, setInvoiceDocUrl] = useState<string>(
+    order.invoiceDocUrl || "",
   );
-  const [pnbpPengawasan, setPnbpPengawasan] = useState<number>(
-    order.pnbpPengawasanAmount !== undefined
-      ? order.pnbpPengawasanAmount
-      : pnbpCalc.pnbpPengawasan,
-  );
-  const [accurateNotes, setAccurateNotes] = useState<string>(
-    order.accurateSyncNotes || "",
+  const [invoiceDocName, setInvoiceDocName] = useState<string>(
+    order.invoiceDocName || "",
   );
 
-  // 9. Kalkulasi Real-time Agregat
-  const jasaPbm = Math.round(tonase * ratePerTon);
-  const subtotalJasa =
-    jasaPbm +
-    Number(rkbmFee || 0) +
-    Number(kepabeananFee || 0) +
-    Number(cooFee || 0);
-  const ppn = includePpn ? Math.round(subtotalJasa * 0.11) : 0;
-  const totalPnbp = Number(pnbpBarang || 0) + Number(pnbpPengawasan || 0);
-  const grandTotal = subtotalJasa + ppn + totalPnbp;
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setInvoiceFile(file);
+      setInvoiceDocName(file.name);
+      setInvoiceDocUrl(URL.createObjectURL(file));
+    }
+  };
 
-  // 10. Submit Handler
+  // 5. Submit Handler (Upload Invoice & Kirim)
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!invoiceNo.trim()) {return;}
-
     onSave({
-      invoiceNo: invoiceNo.trim(),
+      invoiceNo,
       invoiceDate,
       dueDate,
       ratePerTon,
@@ -147,11 +195,12 @@ export const useProcessInvoiceModal = ({
       subtotalJasa,
       subtotalInvoice: subtotalJasa,
       ppnAmount: ppn,
-      pnbpBarangAmount: pnbpBarang,
-      pnbpPengawasanAmount: pnbpPengawasan,
+      pnbpBarangAmount: pnbpCalc.pnbpBarang,
+      pnbpPengawasanAmount: pnbpCalc.pnbpPengawasan,
       totalPnbpReimbursement: totalPnbp,
       totalInvoice: grandTotal,
-      accurateSyncNotes: accurateNotes.trim(),
+      invoiceDocUrl,
+      invoiceDocName,
     });
   };
 
@@ -159,39 +208,31 @@ export const useProcessInvoiceModal = ({
     order,
     tonase,
     contract,
-    pnbpCalc,
+    isPbm,
+    isRkbm,
+    isCustoms,
+    isPnbpGratis,
     invoiceNo,
     setInvoiceNo,
     invoiceDate,
     setInvoiceDate,
     dueDate,
     setDueDate,
+    invoiceFile,
+    invoiceDocUrl,
+    invoiceDocName,
+    handleFileChange,
     ratePerTon,
-    setRatePerTon,
-    rkbmFee,
-    setRkbmFee,
-    kepabeananFee,
-    setKepabeananFee,
-    cooFee,
-    setCooFee,
-    includePpn,
-    setIncludePpn,
-    pnbpBarang,
-    setPnbpBarang,
-    pnbpPengawasan,
-    setPnbpPengawasan,
-    accurateNotes,
-    setAccurateNotes,
     jasaPbm,
+    rkbmFee,
+    kepabeananFee,
+    cooFee,
     subtotalJasa,
     ppn,
+    pnbpCalc,
     totalPnbp,
     grandTotal,
     handleSubmit,
     onClose,
   };
 };
-
-export type UseProcessInvoiceModalReturn = ReturnType<
-  typeof useProcessInvoiceModal
->;

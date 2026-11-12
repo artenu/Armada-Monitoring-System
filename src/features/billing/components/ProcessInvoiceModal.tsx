@@ -1,6 +1,6 @@
-import { Receipt, Send } from "lucide-react";
+import { Receipt, Upload, ExternalLink } from "lucide-react";
 import { Modal, Button } from "@/components/ui";
-import { Input, NumberInput, Checkbox } from "@/components/forms";
+import { Input } from "@/components/forms";
 import { formatRupiah } from "@/utils/formatters";
 import type { ProcessInvoiceModalProps } from "@/types";
 import { useProcessInvoiceModal } from "../hooks/useProcessInvoiceModal";
@@ -10,32 +10,27 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
     order,
     tonase,
     contract,
-    pnbpCalc,
+    isPbm,
+    isRkbm,
+    isCustoms,
+    isPnbpGratis,
     invoiceNo,
     setInvoiceNo,
     invoiceDate,
     setInvoiceDate,
     dueDate,
     setDueDate,
+    invoiceDocUrl,
+    invoiceDocName,
+    handleFileChange,
     ratePerTon,
-    setRatePerTon,
-    rkbmFee,
-    setRkbmFee,
-    kepabeananFee,
-    setKepabeananFee,
-    cooFee,
-    setCooFee,
-    includePpn,
-    setIncludePpn,
-    pnbpBarang,
-    setPnbpBarang,
-    pnbpPengawasan,
-    setPnbpPengawasan,
-    accurateNotes,
-    setAccurateNotes,
     jasaPbm,
+    rkbmFee,
+    kepabeananFee,
+    cooFee,
     subtotalJasa,
     ppn,
+    pnbpCalc,
     totalPnbp,
     grandTotal,
     handleSubmit,
@@ -47,22 +42,20 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
       isOpen={true}
       onClose={onClose}
       icon={Receipt}
-      title="Proforma Invoice & Sinkronisasi Accurate"
-      description={`Order: ${order.id} • ${order.customer} (${order.vessel})`}
+      title="Proforma & Upload Invoice Resmi"
+      description={`Order: ${order.id} • ${order.customer} (${order.vessel || "Tanpa Kapal"})`}
       maxWidth="2xl">
       <form onSubmit={handleSubmit} className="p-5 space-y-4">
-        {/* Ringkasan Kontrak & Muatan */}
+        {/* 1. Ringkasan Kontrak & Muatan */}
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
           <div>
             <span className="text-slate-400 block text-[10.5px]">
               Customer:
             </span>
             <span className="font-bold text-slate-800">{order.customer}</span>
-            {contract && (
-              <span className="text-[10px] text-emerald-600 block font-semibold mt-0.5">
-                ✓ Kontrak Terdaftar
-              </span>
-            )}
+            <span className="text-[10px] text-emerald-600 block font-semibold mt-0.5">
+              ✓ {contract?.service || order.service || "Kontrak Aktif"}
+            </span>
           </div>
           <div>
             <span className="text-slate-400 block text-[10.5px]">
@@ -74,15 +67,15 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
           </div>
           <div>
             <span className="text-slate-400 block text-[10.5px]">
-              Jetty / POL:
+              Lokasi / Pelabuhan:
             </span>
             <span className="font-semibold text-slate-800">
-              {order.pol} ({order.polJettyType || "Private"})
+              {order.pol || "Muara Berau"} ({order.polJettyType || "Private"})
             </span>
           </div>
         </div>
 
-        {/* Form Administrasi Nomor & Tanggal */}
+        {/* 2. Form Administrasi Nomor & Tanggal */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Input
             required
@@ -107,103 +100,53 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
           />
         </div>
 
-        {/* Pengaturan Jasa PBM & RKBM */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <NumberInput
-            label="Tarif Jasa PBM (per MT)"
-            prefix="Rp"
-            badgeText={order.rateType ? `[${order.rateType}]` : undefined}
-            value={ratePerTon}
-            onChange={(val) => setRatePerTon(val ?? 0)}
-          />
-
-          <NumberInput
-            label="Fee Dokumen RKBM"
-            prefix="Rp"
-            badgeText={
-              order.polJettyType === "Private"
-                ? "(Private Jetty: Rp 0)"
-                : undefined
-            }
-            value={rkbmFee}
-            onChange={(val) => setRkbmFee(val ?? 0)}
-          />
-        </div>
-
-        {/* Jasa Dokumen Kepabeanan & COO (Tampil Otomatis Jika Kontrak Ada) */}
-        {(Boolean(contract?.kepabeananFee) ||
-          Boolean(contract?.cooFee) ||
-          kepabeananFee > 0 ||
-          cooFee > 0) && (
-          <div className="p-3 bg-indigo-50/50 border border-indigo-200 rounded-xl space-y-2">
-            <span className="text-xs font-bold text-indigo-900 block">
-              Jasa Dokumen Kepabeanan & COO (Flat per Dokumen)
+        {/* 3. Upload Berkas Invoice Resmi (Sesuai MOM 11 Nov 2026) */}
+        <div className="p-3.5 bg-amber-50/60 border border-amber-200 rounded-xl space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-bold text-amber-900">
+              Upload Dokumen Invoice Resmi (PDF / Gambar)
+            </label>
+            <span className="text-[10.5px] text-amber-700 font-medium">
+              Wajib untuk merilis ke status Terkirim
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <NumberInput
-                label="Fee Kepabeanan"
-                prefix="Rp"
-                value={kepabeananFee}
-                onChange={(val) => setKepabeananFee(val ?? 0)}
-              />
-              <NumberInput
-                label="Fee COO (SKA)"
-                prefix="Rp"
-                value={cooFee}
-                onChange={(val) => setCooFee(val ?? 0)}
-              />
-            </div>
           </div>
-        )}
 
-        {/* Opsi PPN 11% (Menggunakan Reusable Checkbox Component) */}
-        <Checkbox
-          id="include-ppn"
-          card
-          checked={includePpn}
-          onChange={(e) => setIncludePpn(e.target.checked)}
-          label="Kenakan PPN 11% pada Total Tagihan Jasa"
-          description="Dihitung 11% dari subtotal jasa kena pajak (Jasa PBM, Dokumen RKBM, Kepabeanan & COO)"
-        />
+          <div className="flex items-center gap-2">
+            <label className="flex-1 flex items-center gap-2 px-3.5 py-2.5 border border-dashed border-amber-300 hover:border-amber-500 rounded-lg cursor-pointer bg-white transition-colors">
+              <Upload className="w-4 h-4 text-amber-600 shrink-0" />
+              <span className="text-xs text-slate-700 truncate">
+                {invoiceDocName || "Pilih berkas invoice (PDF atau gambar)..."}
+              </span>
+              <input
+                type="file"
+                accept=".pdf,image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </label>
 
-        {/* Reimbursement PNBP */}
-        <div className="p-3 bg-blue-50/50 border border-blue-200 rounded-xl space-y-2">
-          <span className="text-xs font-bold text-blue-900 block">
-            Reimbursement PNBP (Talangan Kas Negara - Non PPN)
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <NumberInput
-              label={`PNBP Barang (${order.activityType})`}
-              prefix="Rp"
-              value={pnbpBarang}
-              onChange={(val) => setPnbpBarang(val ?? 0)}
-            />
-
-            <NumberInput
-              label="PNBP Pengawasan Bongkar Muat"
-              prefix="Rp"
-              value={pnbpPengawasan}
-              onChange={(val) => setPnbpPengawasan(val ?? 0)}
-            />
+            {Boolean(invoiceDocUrl) && (
+              <a
+                href={invoiceDocUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 text-amber-800 hover:text-amber-900 bg-amber-100 rounded-lg cursor-pointer transition-colors"
+                title="Lihat Pratinjau Dokumen">
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Catatan Sinkronisasi Accurate */}
-        <Input
-          label="Catatan Sinkronisasi Software Accurate (Opsional)"
-          placeholder="Contoh: No faktur Accurate #2026-0421 / Pembulatan kas"
-          value={accurateNotes}
-          onChange={(e) => setAccurateNotes(e.target.value)}
-        />
-
-        {/* Rekap Total Tagihan: Terpisah Antara Jasa vs PNBP */}
+        {/* 4. Rincian Biaya & Tagihan Otomatis (Read-Only) */}
         <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
-          {/* 1. Rincian Tagihan Jasa (Objek PPN) */}
+          {/* A. Tagihan Jasa Kena Pajak */}
           <div className="space-y-1.5 pb-2 border-b border-slate-200">
             <span className="font-bold text-slate-700 block text-[11px] uppercase tracking-wider">
-              1. Rincian Tagihan Jasa (Objek PPN)
+              1. Rincian Tagihan Jasa (Objek PPN 11%)
             </span>
-            {Boolean(jasaPbm) && (
+
+            {isPbm && (
               <div className="flex justify-between text-slate-600 pl-2">
                 <span>
                   • Jasa PBM ({tonase.toLocaleString("id-ID")} MT ×{" "}
@@ -214,84 +157,107 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
                 </span>
               </div>
             )}
-            {Boolean(rkbmFee) && (
+
+            {isRkbm && (
               <div className="flex justify-between text-slate-600 pl-2">
-                <span>• Fee Dokumen RKBM:</span>
+                <span>• Fee Dokumen RKBM ({order.rkbmType || "Muat"}):</span>
                 <span className="font-mono font-medium">
                   {formatRupiah(rkbmFee)}
                 </span>
               </div>
             )}
-            {Boolean(kepabeananFee) && (
-              <div className="flex justify-between text-slate-600 pl-2">
-                <span>• Jasa Kepabeanan:</span>
-                <span className="font-mono font-medium">
-                  {formatRupiah(kepabeananFee)}
-                </span>
-              </div>
+
+            {isCustoms && (
+              <>
+                <div className="flex justify-between text-slate-600 pl-2">
+                  <span>• Jasa Pengawasan Kepabeanan:</span>
+                  <span className="font-mono font-medium">
+                    {formatRupiah(kepabeananFee)}
+                  </span>
+                </div>
+                {Boolean(cooFee) && (
+                  <div className="flex justify-between text-slate-600 pl-2">
+                    <span>• Fee Penerbitan COO:</span>
+                    <span className="font-mono font-medium">
+                      {formatRupiah(cooFee)}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
-            {Boolean(cooFee) && (
-              <div className="flex justify-between text-slate-600 pl-2">
-                <span>• Jasa Penerbitan COO:</span>
-                <span className="font-mono font-medium">
-                  {formatRupiah(cooFee)}
-                </span>
-              </div>
-            )}
+
             <div className="flex justify-between text-slate-800 font-semibold pt-1 border-t border-dashed border-slate-200">
-              <span>Subtotal Tagihan Jasa:</span>
+              <span>Subtotal Tagihan Jasa (DPP):</span>
               <span className="font-mono">{formatRupiah(subtotalJasa)}</span>
             </div>
-            <div className="flex justify-between text-slate-600">
-              <span>PPN 11%:</span>
+
+            <div className="flex justify-between text-slate-600 pl-2">
+              <span>PPN 11% (Otomatis):</span>
               <span className="font-mono font-medium text-emerald-700">
                 +{formatRupiah(ppn)}
               </span>
             </div>
           </div>
 
-          {/* 2. Rincian Reimbursement PNBP (Non PPN) */}
+          {/* B. Reimbursement PNBP */}
           <div className="space-y-1.5 pb-2 border-b border-slate-200">
-            <span className="font-bold text-blue-900 block text-[11px] uppercase tracking-wider">
-              2. Rincian Reimbursement PNBP (Talangan Kas Negara - Non PPN)
-            </span>
-            <div className="flex justify-between text-slate-600 pl-2">
-              <span>
-                • PNBP Barang ({order.activityType} @ Rp {pnbpCalc.rateBarang}
-                /MT):
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-blue-900 block text-[11px] uppercase tracking-wider">
+                2. Reimbursement PNBP (Non PPN)
               </span>
-              <span className="font-mono font-medium text-blue-700">
-                {formatRupiah(pnbpBarang)}
-              </span>
+              {isPnbpGratis && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                  GRATIS (Kontrak Khusus)
+                </span>
+              )}
             </div>
-            <div className="flex justify-between text-slate-600 pl-2">
-              <span>• PNBP Pengawasan Bongkar Muat (@ Rp 54/MT):</span>
-              <span className="font-mono font-medium text-blue-700">
-                {formatRupiah(pnbpPengawasan)}
-              </span>
-            </div>
+
+            {isPnbpGratis ? (
+              <div className="text-slate-500 italic pl-2 text-[11px]">
+                PNBP Jasa Barang & Pengawasan dibebaskan (Rp 0).
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between text-slate-600 pl-2">
+                  <span>
+                    • PNBP Barang ({order.activityType || "Domestik"} @ Rp{" "}
+                    {pnbpCalc.rateBarang}/MT):
+                  </span>
+                  <span className="font-mono font-medium text-blue-700">
+                    {formatRupiah(pnbpCalc.pnbpBarang)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-slate-600 pl-2">
+                  <span>• PNBP Pengawasan (@ Rp 54/MT):</span>
+                  <span className="font-mono font-medium text-blue-700">
+                    {formatRupiah(pnbpCalc.pnbpPengawasan)}
+                  </span>
+                </div>
+              </>
+            )}
+
             <div className="flex justify-between text-blue-900 font-semibold pt-1 border-t border-dashed border-blue-200">
-              <span>Total Reimbursement PNBP:</span>
+              <span>Total PNBP:</span>
               <span className="font-mono">{formatRupiah(totalPnbp)}</span>
             </div>
           </div>
 
-          {/* Grand Total */}
+          {/* C. Total Keseluruhan */}
           <div className="flex justify-between items-center pt-1 text-sm font-black text-slate-900">
-            <span>TOTAL DITAGIHKAN (Jasa + PPN + PNBP):</span>
+            <span>TOTAL TAGIHAN:</span>
             <span className="font-mono text-base text-red-600 font-bold">
               {formatRupiah(grandTotal)}
             </span>
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* 5. Footer Actions */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
           <Button variant="outline" type="button" onClick={onClose}>
             Batal
           </Button>
-          <Button variant="primary" type="submit" leftIcon={Send}>
-            Terbitkan & Kirim Invoice
+          <Button variant="primary" type="submit" leftIcon={Upload}>
+            Upload Invoice
           </Button>
         </div>
       </form>

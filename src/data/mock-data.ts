@@ -1,24 +1,46 @@
 import type { OrderItem } from "@/types";
 
 // Pilihan Layanan Order (Sesuai Revisi Bos: PNBP sudah di-takedown)
+// 4 Layanan Resmi Sesuai MOM 11 Nov 2026
 export const SERVICE_OPTIONS = [
-  "Jasa PBM",
-  "Pengurusan RKBM",
-  "Pengurusan Kepabeanan dan COO",
-];
+  "LAYANAN PBM",
+  "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR",
+  "LAYANAN JASA VENDER & MURING",
+  "JASA PENGAWASAN KEPABEANAN & COO",
+] as const;
 
-export const CUSTOMER_OPTIONS = [
-  "PT Alfara Delta Persada",
-  "Armada Maritim Perkasa",
-  "Christian Eka Pratama",
-];
+export type ServiceType = (typeof SERVICE_OPTIONS)[number];
 
-export const END_USER_OPTIONS = [
-  "Christian eka pratama",
-  "PT. Kedap Sayap",
-  "PT. Mareta Persada",
-  "PT. Maharaja Mineral",
-];
+// Helper kompatibilitas untuk mendeteksi kategori layanan di seluruh sistem
+export const isPbmService = (service?: string) =>
+  service === "LAYANAN PBM" || service === "Jasa PBM";
+
+export const isRkbmService = (service?: string) =>
+  service === "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR" ||
+  service === "Pengurusan RKBM";
+
+export const isFenderMooringService = (service?: string) =>
+  service === "LAYANAN JASA VENDER & MURING" ||
+  service === "Jasa Vender & Muring";
+
+export const isCustomsService = (service?: string) =>
+  service === "JASA PENGAWASAN KEPABEANAN & COO" ||
+  service === "Pengurusan Kepabeanan dan COO";
+
+export const CUSTOMER_END_USER_OPTIONS = [
+  "PT ADP",
+  "PT ACI",
+  "PT CEP",
+  "PT AMP",
+  "PT KS",
+  "PT MRM",
+  "PT MP",
+  "PT BUP PTB",
+  "PT ZADIN",
+] as const;
+
+export const CUSTOMER_OPTIONS = CUSTOMER_END_USER_OPTIONS;
+export const END_USER_OPTIONS = CUSTOMER_END_USER_OPTIONS;
 
 export const POL_OPTIONS = [
   "Muara Berau",
@@ -117,5 +139,6 @@ export const SHIPMENT_CATEGORY_OPTIONS = [
   "Batu Bara",
   "Batu Split",
   "Alat Berat",
+  "Lainnya",
 ] as const;
 export type ShipmentCategory = (typeof SHIPMENT_CATEGORY_OPTIONS)[number];

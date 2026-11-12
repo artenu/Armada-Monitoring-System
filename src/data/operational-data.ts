@@ -12,7 +12,7 @@ export const OPERATIONAL_TAB_CONFIGS: OperationalTabConfig[] = [
 
 export const getMasterAgentList = (): string[] => {
   try {
-    const raw = localStorage.getItem("gds_master_data_v1");
+    const raw = localStorage.getItem("gds_master_data_v3");
     if (raw) {
       const parsed = JSON.parse(raw) as {
         agen?: Array<{ nama: string; status: string }>;
@@ -31,7 +31,7 @@ export const getMasterAgentList = (): string[] => {
 
 export const getMasterLocationList = (): string[] => {
   try {
-    const raw = localStorage.getItem("gds_master_data_v1");
+    const raw = localStorage.getItem("gds_master_data_v3");
     if (raw) {
       const parsed = JSON.parse(raw) as {
         lokasi?: Array<{ nama: string; status: string }>;

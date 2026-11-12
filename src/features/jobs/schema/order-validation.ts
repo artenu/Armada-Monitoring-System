@@ -1,4 +1,5 @@
 import type { ValidateFilesParams } from "@/types";
+import { isPbmService, isRkbmService } from "@/data/mock-data";
 
 /**
  * Validasi keberadaan berkas wajib (Surat Penunjukan, 3 Dokumen KSOP untuk RKBM)
@@ -17,14 +18,14 @@ export const validateOrderFiles = ({
   }
 
   // 1. Layanan Jasa PBM: Surat Penunjukan (SI) wajib diunggah
-  if (data.service === "Jasa PBM") {
+  if (isPbmService(data.service)) {
     if (!spFile) {
       return "Surat Penunjukan (SI) wajib diunggah untuk layanan Jasa PBM.";
     }
   }
 
   // 2. Layanan Pengurusan RKBM: 3 Dokumen Persyaratan KSOP wajib diunggah
-  if (data.service === "Pengurusan RKBM") {
+  if (isRkbmService(data.service)) {
     if (!suratPenunjukanFile) {
       return "Surat Penunjukan KSOP wajib diunggah untuk pengajuan RKBM.";
     }
