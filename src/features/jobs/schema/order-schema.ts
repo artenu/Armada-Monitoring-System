@@ -1,22 +1,23 @@
 import * as yup from "yup";
+import { isCustomsService } from "@/data/mock-data";
 
 export const orderSchema = yup.object({
   customer: yup.string().required("Customer wajib dipilih"),
   // End User: Wajib kecuali layanan Pengurusan Kepabeanan dan COO
   endUser: yup.string().when("service", {
-    is: (svc: string) => svc === "Pengurusan Kepabeanan dan COO",
+    is: (svc: string) => isCustomsService(svc),
     then: (schema) => schema.optional(),
     otherwise: (schema) => schema.required("End User wajib dipilih"),
   }),
   // Mother Vessel: Wajib untuk PBM & RKBM, opsional untuk Kepabeanan & COO
   vessel: yup.string().when("service", {
-    is: (svc: string) => svc === "Pengurusan Kepabeanan dan COO",
+    is: (svc: string) => isCustomsService(svc),
     then: (schema) => schema.optional(),
     otherwise: (schema) => schema.required("Nama Vessel wajib diisi"),
   }),
   // Jenis Kegiatan: Wajib kecuali Kepabeanan & COO
   activityType: yup.string().when("service", {
-    is: (svc: string) => svc === "Pengurusan Kepabeanan dan COO",
+    is: (svc: string) => isCustomsService(svc),
     then: (schema) => schema.optional(),
     otherwise: (schema) => schema.required("Jenis kegiatan wajib dipilih"),
   }),
@@ -28,7 +29,9 @@ export const orderSchema = yup.object({
     .string()
     .required("Estimasi tonase wajib diisi")
     .test("min-tonnage", "Estimasi tonase harus lebih dari 0 MT", (val) => {
-      if (!val) {return false;}
+      if (!val) {
+        return false;
+      }
       const num = Number(val.replace(/\./g, ""));
       return !isNaN(num) && num > 0;
     }),
@@ -37,16 +40,22 @@ export const orderSchema = yup.object({
 
   // Field Armada: Tug Boat & Barge Mandatory untuk Kepabeanan & COO
   tugBoat: yup.string().when("service", {
-    is: (svc: string) => svc === "Pengurusan Kepabeanan dan COO",
-    then: (schema) => schema.required("Nama Kapal (Tug Boat) wajib diisi untuk Kepabeanan & COO"),
+    is: (svc: string) => isCustomsService(svc),
+    then: (schema) =>
+      schema.required(
+        "Nama Kapal (Tug Boat) wajib diisi untuk Kepabeanan & COO",
+      ),
     otherwise: (schema) => schema.optional(),
   }),
   bargeNomination: yup.string().when("service", {
-    is: (svc: string) => svc === "Pengurusan Kepabeanan dan COO",
-    then: (schema) => schema.required("Barge (Tongkang) wajib diisi untuk Kepabeanan & COO"),
+    is: (svc: string) => isCustomsService(svc),
+    then: (schema) =>
+      schema.required("Barge (Tongkang) wajib diisi untuk Kepabeanan & COO"),
     otherwise: (schema) => schema.optional(),
   }),
-  shipmentType: yup.string().required("Kategori muatan (Shipment) wajib dipilih"),
+  shipmentType: yup
+    .string()
+    .required("Kategori muatan (Shipment) wajib dipilih"),
 
   // Khusus Layanan Pengurusan RKBM
   rkbmType: yup.string().optional(),

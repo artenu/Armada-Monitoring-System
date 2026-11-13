@@ -1,6 +1,11 @@
 import { FileCheck2, DollarSign, ShieldAlert } from "lucide-react";
 import { Input, Select } from "@/components/forms";
 import type { UseCreateOrderModalReturn } from "@/features/jobs/hooks/useCreateOrderModal";
+import {
+  isPbmService,
+  isRkbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 export const OrderServiceDetailsSection = ({
   form,
@@ -18,8 +23,8 @@ export const OrderServiceDetailsSection = ({
     pnbpPreview,
   } = form;
 
-  // 1. Kondisional Khusus Layanan Pengurusan RKBM
-  if (selectedService === "Pengurusan RKBM") {
+  // 1. Khusus LAYANAN RKBM MUAT/BONGKAR
+  if (isRkbmService(selectedService)) {
     return (
       <div className="border border-amber-200 rounded-xl bg-white shadow-2xs animate-in fade-in duration-200">
         <div className="border-l-4 border-amber-500 px-4 py-2 bg-amber-50/70 flex items-center justify-between rounded-t-xl">
@@ -76,8 +81,8 @@ export const OrderServiceDetailsSection = ({
     );
   }
 
-  // 2. Kondisional Khusus Layanan Pengurusan Kepabeanan dan COO
-  if (selectedService === "Pengurusan Kepabeanan dan COO") {
+  // 2. Khusus JASA PENGAWASAN KEPABEANAN & COO (Dengan Checkbox Validasi COO)
+  if (isCustomsService(selectedService)) {
     return (
       <div className="border border-purple-200 rounded-xl bg-white shadow-2xs animate-in fade-in duration-200">
         <div className="border-l-4 border-purple-600 px-4 py-2 bg-purple-50/70 flex items-center justify-between rounded-t-xl">
@@ -136,8 +141,8 @@ export const OrderServiceDetailsSection = ({
                 </span>
                 <p className="text-[11px] text-purple-700">
                   {selectedIncludeCoo
-                    ? "✓ Order ini mencakup penerbitan COO (+Rp 2.000.000 untuk Alfara). Di tahap operasional wajib upload dokumen PEB dan COO."
-                    : "Order ini hanya mencakup jasa Kepabeanan (Bea Cukai). Di tahap operasional cukup upload dokumen PEB."}
+                    ? "✓ Order ini mencakup penerbitan COO (+Rp 2.000.000). Di tahap operasional wajib upload dokumen PEB dan COO."
+                    : "Order ini hanya mencakup jasa Pengawasan Kepabeanan (Bea Cukai). Di tahap operasional cukup upload dokumen PEB."}
                 </p>
               </div>
             </label>
@@ -147,8 +152,8 @@ export const OrderServiceDetailsSection = ({
     );
   }
 
-  // 3. Kondisional Khusus Layanan Jasa PBM & PNBP
-  if (selectedService === "Jasa PBM") {
+  // 3. Khusus LAYANAN PBM & PNBP (Bersih Tanpa Input COO)
+  if (isPbmService(selectedService)) {
     return (
       <div className="border border-emerald-200 rounded-xl bg-white shadow-2xs animate-in fade-in duration-200">
         <div className="border-l-4 border-emerald-600 px-4 py-2 bg-emerald-50/70 flex items-center justify-between rounded-t-xl">

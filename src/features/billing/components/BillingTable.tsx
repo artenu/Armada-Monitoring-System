@@ -10,6 +10,7 @@ import {
   Inbox,
   Pencil,
   Check,
+  Upload,
 } from "lucide-react";
 import {
   Button,
@@ -194,11 +195,15 @@ export const BillingTable = ({
                       {!isPaid && (
                         <Button
                           size="sm"
-                          variant="secondary"
-                          leftIcon={hasInvoice ? Pencil : Receipt}
+                          variant={hasInvoice ? "secondary" : "primary"}
+                          leftIcon={hasInvoice ? Pencil : Upload}
                           onClick={() => onSelectForInvoice(order)}
-                          title="Auto-generate / Sesuaikan Angka Accurate">
-                          {hasInvoice ? "Edit / Accurate" : "Proforma Invoice"}
+                          title={
+                            hasInvoice
+                              ? "Edit Data Invoice"
+                              : "Upload Dokumen Invoice"
+                          }>
+                          {hasInvoice ? "Edit Invoice" : "Upload Invoice"}
                         </Button>
                       )}
 

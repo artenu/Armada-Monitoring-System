@@ -50,7 +50,7 @@ export const getDefaultOrderFormValues = (
     endUser: "",
     vessel: "",
     activityType: "Domestik",
-    service: "Jasa PBM",
+    service: "LAYANAN PBM",
     pol: "",
     pod: "",
     startDate: "",
@@ -125,7 +125,9 @@ export const computePnbpPreview = (
   rawTonnage?: string,
 ) => {
   const numTonnage = Number((rawTonnage || "").replace(/\./g, "")) || 0;
-  if (numTonnage <= 0) {return null;}
+  if (numTonnage <= 0) {
+    return null;
+  }
   return calculatePnbp(
     (activityType as "Ekspor" | "Domestik" | "Impor") || "Domestik",
     numTonnage,

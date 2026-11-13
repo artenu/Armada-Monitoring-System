@@ -3,7 +3,10 @@ import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { orderSchema, type OrderFormData } from "../schema/order-schema";
 import type { CreateOrderModalProps } from "@/types";
-import { getContractRateByCustomer } from "@/data/pricing-data";
+import {
+  getContractRateByCustomer,
+  getContractRateByCustomerAndService,
+} from "@/data/pricing-data";
 import { loadJobMasterOptions } from "@/data/job-data";
 import { validateOrderFiles } from "@/features/jobs/schema/order-validation";
 import {
@@ -23,9 +26,15 @@ export const useCreateOrderModal = ({
   const [rkbmFile, setRkbmFile] = useState<File | null>(null);
   const [rkbmBongkarFile, setRkbmBongkarFile] = useState<File | null>(null);
   // 3 Persyaratan KSOP untuk Permohonan RKBM (Tahap Sales)
-  const [suratPenunjukanFile, setSuratPenunjukanFile] = useState<File | null>(null);
-  const [suratPermohonanFile, setSuratPermohonanFile] = useState<File | null>(null);
-  const [suratPernyataanFile, setSuratPernyataanFile] = useState<File | null>(null);
+  const [suratPenunjukanFile, setSuratPenunjukanFile] = useState<File | null>(
+    null,
+  );
+  const [suratPermohonanFile, setSuratPermohonanFile] = useState<File | null>(
+    null,
+  );
+  const [suratPernyataanFile, setSuratPernyataanFile] = useState<File | null>(
+    null,
+  );
   const [fileError, setFileError] = useState<string | null>(null);
 
   // 2. Data Master Options
@@ -54,15 +63,24 @@ export const useCreateOrderModal = ({
   const selectedIncludeCoo = useWatch({ control, name: "includeCoo" });
   const selectedSpotRateAmount = useWatch({ control, name: "spotRateAmount" });
   const selectedShipmentType = useWatch({ control, name: "shipmentType" });
+  const selectedPol = useWatch({ control, name: "pol" });
 
   // 5. Derived Values dari Utilitas
-  const contractInfo = useMemo(
-    () =>
-      selectedCustomer
-        ? getContractRateByCustomer(selectedCustomer)
-        : undefined,
-    [selectedCustomer],
-  );
+  const contractInfo = useMemo(() => {
+    if (!selectedCustomer) {
+      return undefined;
+    }
+    const location = selectedPol?.toLowerCase().includes("jawa")
+      ? "Muara Jawa"
+      : "Muara Berau";
+    return (
+      getContractRateByCustomerAndService(
+        selectedCustomer,
+        selectedService,
+        location,
+      ) || getContractRateByCustomer(selectedCustomer)
+    );
+  }, [selectedCustomer, selectedService, selectedPol]);
 
   const pnbpPreview = useMemo(
     () => computePnbpPreview(selectedActivity, rawTonnage),

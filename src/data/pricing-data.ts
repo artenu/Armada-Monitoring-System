@@ -1,55 +1,85 @@
 import type { CustomerContractRate } from "@/types/finance/financeTypes";
 
-export const CONTRACT_RATES_STORAGE_KEY = "gds_contract_rates_v1";
+export const CONTRACT_RATES_STORAGE_KEY = "gds_service_contract_rates_v3";
 
 /**
- * Data Kontrak Resmi Sesuai MOM 5 November 2026 (Data Awal / Seeder)
+ * Master Data Tarif Kontrak Resmi berbasis Layanan & Lokasi
+ * Sesuai MOM 11 November 2026
  */
 export const CONTRACT_RATES_DATABASE: CustomerContractRate[] = [
+  // 1. LAYANAN PBM - Muara Berau (PT BUP PTB)
   {
-    id: "RATE-001",
-    customerId: "ALFARA",
-    customerName: "PT Alfara Delta Persada",
-    pbmRatePerTon: 490, // 490 rupiah/MT
+    id: "RATE-PBM-001",
+    service: "LAYANAN PBM",
+    location: "Muara Berau",
+    customerId: "PTB",
+    customerName: "PT BUP PTB",
+    pbmRatePerTon: 11000, // Rp 11.000 / MT
+    pnbpBarangType: "Gratis",
+    pnbpPengawasanType: "Gratis",
+    pnbpBarangAmount: 0,
+    pnbpPengawasanAmount: 0,
+    status: "Aktif",
+    notes:
+      "PBM Rp 11.000/MT, PNBP Barang & Pengawasan GRATIS (MOM 11 Nov 2026)",
+  },
+  // 2. LAYANAN PBM - Muara Jawa (PT CEP)
+  {
+    id: "RATE-PBM-002",
+    service: "LAYANAN PBM",
+    location: "Muara Jawa",
+    customerId: "CEP",
+    customerName: "PT CEP",
+    pbmRatePerTon: 0, // TBD / Menunggu konfirmasi
+    pnbpBarangType: "Belum Diketahui",
+    pnbpPengawasanType: "Belum Diketahui",
+    status: "Aktif",
+    notes: "Menunggu konfirmasi angka resmi (MOM 11 Nov 2026)",
+  },
+  // 3. LAYANAN RKBM - Muara Berau (Template Siap Pakai)
+  {
+    id: "RATE-RKBM-001",
+    service: "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR",
+    location: "Muara Berau",
+    customerId: "ADP",
+    customerName: "PT ADP",
     rkbmBongkarFee: 0,
     rkbmMuatPrivateFee: 0,
     rkbmMuatPublicFee: 350000,
-    kepabeananFee: 12000000, // 12 Juta (Sesuai MOM)
-    cooFee: 2000000, // 2 Juta (Sesuai MOM)
+    pnbpBarangType: "Gratis",
+    pnbpPengawasanType: "Gratis",
     status: "Aktif",
-    notes: "Kepabeanan 12jt, COO 2jt MOM 7 Nov 2026",
+    notes: "Tarif RKBM Muara Berau TBD (MOM 11 Nov 2026)",
   },
+  // 4. LAYANAN RKBM - Muara Jawa (Template Siap Pakai)
   {
-    id: "RATE-002",
-    customerId: "AMP",
-    customerName: "Armada Maritim Perkasa",
-    pbmRatePerTon: 0,
-    rkbmBongkarFee: 0,
-    rkbmMuatPrivateFee: 0,
-    rkbmMuatPublicFee: 0,
-    kepabeananFee: 10000000, // 10 Juta (Sesuai MOM)
-    cooFee: 0, // Belum diketahui / TBD (Sesuai MOM)
-    status: "Aktif",
-    notes: "Kepabeanan 10jt, COO TBD MOM 7 Nov 2026",
-  },
-  {
-    id: "RATE-003",
+    id: "RATE-RKBM-002",
+    service: "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR",
+    location: "Muara Jawa",
     customerId: "CEP",
-    customerName: "Christian Eka Pratama",
-    pbmRatePerTon: 250, // 250 rupiah/MT
-    rkbmBongkarFee: 500000, // 500 ribu
-    rkbmMuatPrivateFee: 0, // Free di Private Jetty
-    rkbmMuatPublicFee: 350000, // 350 ribu di Public Jetty
-    kepabeananFee: 0,
-    cooFee: 0,
+    customerName: "PT CEP",
+    rkbmBongkarFee: 500000,
+    rkbmMuatPrivateFee: 0,
+    rkbmMuatPublicFee: 350000,
+    pnbpBarangType: "Gratis",
+    pnbpPengawasanType: "Gratis",
     status: "Aktif",
-    notes: "PBM 250/MT, RKBM Bongkar 500rb, Muat Public 350rb MOM 7 Nov 2026",
+    notes: "Tarif RKBM Muara Jawa (MOM 11 Nov 2026)",
+  },
+  // 5. JASA PENGAWASAN KEPABEANAN & COO
+  {
+    id: "RATE-CUST-001",
+    service: "JASA PENGAWASAN KEPABEANAN & COO",
+    location: "Muara Berau",
+    customerId: "ALFARA",
+    customerName: "PT ADP",
+    kepabeananFee: 12000000,
+    cooFee: 2000000,
+    status: "Aktif",
+    notes: "Kepabeanan 12jt, COO 2jt",
   },
 ];
 
-/**
- * Helper membaca data tarif kontrak dari localStorage
- */
 export const getContractRatesFromStorage = (): CustomerContractRate[] => {
   try {
     const raw = localStorage.getItem(CONTRACT_RATES_STORAGE_KEY);
@@ -65,21 +95,41 @@ export const getContractRatesFromStorage = (): CustomerContractRate[] => {
   return CONTRACT_RATES_DATABASE;
 };
 
-/**
- * Helper menyimpan tarif kontrak ke localStorage
- */
 export const saveContractRatesToStorage = (
   rates: CustomerContractRate[],
 ): void => {
   try {
     localStorage.setItem(CONTRACT_RATES_STORAGE_KEY, JSON.stringify(rates));
   } catch {
-    // fallback
+    // ignore
   }
 };
 
+export const getContractRateByCustomerAndService = (
+  customerName: string,
+  service?: string,
+  location?: string,
+): CustomerContractRate | undefined => {
+  const allRates = getContractRatesFromStorage();
+  return (
+    allRates.find((r) => {
+      const matchCust =
+        r.customerName.toLowerCase() === customerName.toLowerCase() ||
+        r.customerId.toLowerCase() === customerName.toLowerCase();
+      const matchService = !service || r.service === service;
+      const matchLocation = !location || !r.location || r.location === location;
+      return matchCust && matchService && matchLocation;
+    }) ||
+    allRates.find(
+      (r) =>
+        r.customerName.toLowerCase() === customerName.toLowerCase() ||
+        r.customerId.toLowerCase() === customerName.toLowerCase(),
+    )
+  );
+};
+
 /**
- * Tarif Standar Reimbursement PNBP Sesuai MOM
+ * Tarif Standar Reimbursement PNBP
  */
 export const PNBP_CONFIG = {
   barangInternasionalPerTon: 700, // Ekspor / Impor
@@ -98,7 +148,8 @@ export const getContractRateByCustomer = (
     (rate) =>
       rate.status !== "Nonaktif" &&
       (customerName.toLowerCase().includes(rate.customerId.toLowerCase()) ||
-        customerName.toLowerCase().includes(rate.customerName.toLowerCase())),
+        customerName.toLowerCase().includes(rate.customerName.toLowerCase()) ||
+        rate.customerName.toLowerCase().includes(customerName.toLowerCase())),
   );
 };
 

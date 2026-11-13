@@ -1,6 +1,7 @@
 import { FileText, Upload, X } from "lucide-react";
 import { Input } from "@/components/forms";
 import type { UseCreateOrderModalReturn } from "@/features/jobs/hooks/useCreateOrderModal";
+import { isPbmService, isRkbmService } from "@/data/mock-data";
 
 export const OrderVolumeSection = ({
   form,
@@ -21,8 +22,8 @@ export const OrderVolumeSection = ({
     setSuratPernyataanFile,
   } = form;
 
-  const isPbm = selectedService === "Jasa PBM";
-  const isRkbm = selectedService === "Pengurusan RKBM";
+  const isPbm = isPbmService(selectedService);
+  const isRkbm = isRkbmService(selectedService);
 
   // Helper render tombol upload file
   const renderFileInput = (

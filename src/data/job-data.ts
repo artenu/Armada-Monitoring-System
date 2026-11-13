@@ -9,7 +9,7 @@ export const getMasterListFromStorage = (
   fallback: string[],
 ): string[] => {
   try {
-    const raw = localStorage.getItem("gds_master_data_v1");
+    const raw = localStorage.getItem("gds_master_data_v3");
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed[key]) && parsed[key].length > 0) {
@@ -30,10 +30,10 @@ export const getMasterListFromStorage = (
 export const loadJobMasterOptions = (): JobMasterOptions => {
   let customerList = INITIAL_MASTER_DATA.customer;
   try {
-    const raw = localStorage.getItem("gds_master_data_v1");
+    const raw = localStorage.getItem("gds_master_data_v3");
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed.customer) && parsed.customer.length > 0) {
+      if (Array.isArray(parsed.customer) && parsed.customer.length > 9) {
         customerList = parsed.customer.filter(
           (item: { status: string }) => item.status === "Aktif",
         );

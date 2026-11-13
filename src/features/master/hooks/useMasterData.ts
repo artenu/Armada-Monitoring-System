@@ -25,10 +25,10 @@ import type {
 } from "@/types/master/master-data";
 import { INITIAL_MASTER_DATA, MASTER_CONFIGS } from "@/data/master-mock";
 
-const STORAGE_KEY = "gds_master_data_v1";
+const STORAGE_KEY = "gds_master_data_v3";
 
 export const TAB_ITEMS: TabItem[] = [
-  { key: "customer", label: "Customer", icon: Users },
+  { key: "customer", label: "Customer & End User", icon: Users },
   { key: "tarif", label: "Tarif Kontrak", icon: DollarSign },
   { key: "tug-boat", label: "Tug Boat", icon: Anchor },
   { key: "barge", label: "Barge", icon: Boxes },
@@ -64,6 +64,10 @@ export const useMasterData = () => {
         return {
           ...INITIAL_MASTER_DATA,
           ...parsed,
+          customer:
+            parsed.customer && parsed.customer.length >= 9
+              ? parsed.customer
+              : INITIAL_MASTER_DATA.customer,
           agen:
             parsed.agen && parsed.agen.length > 0
               ? parsed.agen
@@ -88,7 +92,11 @@ export const useMasterData = () => {
   const [contractForm, setContractForm] = useState<ContractRateFormData>({
     customerId: "",
     customerName: "",
+    service: "LAYANAN PBM",
+    location: "Muara Berau",
     pbmRatePerTon: undefined,
+    pnbpBarangType: "Gratis",
+    pnbpPengawasanType: "Gratis",
     rkbmBongkarFee: undefined,
     rkbmMuatPrivateFee: undefined,
     rkbmMuatPublicFee: undefined,
@@ -172,7 +180,9 @@ export const useMasterData = () => {
 
   const handleSaveItem = (e: FormEvent) => {
     e.preventDefault();
-    if (!formData.nama.trim()) {return;}
+    if (!formData.nama.trim()) {
+      return;
+    }
 
     if (editingItem) {
       const updated = items.map((it) =>
@@ -238,7 +248,11 @@ export const useMasterData = () => {
     setContractForm({
       customerId: rate.customerId,
       customerName: rate.customerName,
+      service: rate.service || "LAYANAN PBM",
+      location: rate.location || "Muara Berau",
       pbmRatePerTon: rate.pbmRatePerTon,
+      pnbpBarangType: rate.pnbpBarangType || "Gratis",
+      pnbpPengawasanType: rate.pnbpPengawasanType || "Gratis",
       rkbmBongkarFee: rate.rkbmBongkarFee,
       rkbmMuatPrivateFee: rate.rkbmMuatPrivateFee,
       rkbmMuatPublicFee: rate.rkbmMuatPublicFee,
@@ -265,7 +279,11 @@ export const useMasterData = () => {
                 ...c,
                 customerId: contractForm.customerId,
                 customerName: contractForm.customerName,
+                service: contractForm.service,
+                location: contractForm.location,
                 pbmRatePerTon: contractForm.pbmRatePerTon ?? 0,
+                pnbpBarangType: contractForm.pnbpBarangType,
+                pnbpPengawasanType: contractForm.pnbpPengawasanType,
                 rkbmBongkarFee: contractForm.rkbmBongkarFee ?? 0,
                 rkbmMuatPrivateFee: contractForm.rkbmMuatPrivateFee ?? 0,
                 rkbmMuatPublicFee: contractForm.rkbmMuatPublicFee ?? 0,
@@ -284,7 +302,11 @@ export const useMasterData = () => {
           contractForm.customerId.trim() ||
           contractForm.customerName.toUpperCase().slice(0, 6),
         customerName: contractForm.customerName.trim(),
+        service: contractForm.service,
+        location: contractForm.location,
         pbmRatePerTon: contractForm.pbmRatePerTon ?? 0,
+        pnbpBarangType: contractForm.pnbpBarangType,
+        pnbpPengawasanType: contractForm.pnbpPengawasanType,
         rkbmBongkarFee: contractForm.rkbmBongkarFee ?? 0,
         rkbmMuatPrivateFee: contractForm.rkbmMuatPrivateFee ?? 0,
         rkbmMuatPublicFee: contractForm.rkbmMuatPublicFee ?? 0,
@@ -300,7 +322,9 @@ export const useMasterData = () => {
   };
 
   const handleDeleteContract = (id?: string) => {
-    if (!id) {return;}
+    if (!id) {
+      return;
+    }
     if (confirm("Apakah Anda yakin ingin menghapus data tarif kontrak ini?")) {
       setContractRates((prev) => prev.filter((c) => c.id !== id));
     }
@@ -312,7 +336,9 @@ export const useMasterData = () => {
   };
 
   const getTabCount = (key: TabKey) => {
-    if (key === "tarif") {return contractRates.length;}
+    if (key === "tarif") {
+      return contractRates.length;
+    }
     return dataStore[key]?.length || 0;
   };
 

@@ -1,6 +1,12 @@
 import { Users, CheckCircle2 } from "lucide-react";
 import { Input, Select } from "@/components/forms";
-import { SERVICE_OPTIONS, END_USER_OPTIONS } from "@/data/mock-data";
+import {
+  SERVICE_OPTIONS,
+  END_USER_OPTIONS,
+  isCustomsService,
+  isPbmService,
+  isRkbmService,
+} from "@/data/mock-data";
 import type { UseCreateOrderModalReturn } from "@/features/jobs/hooks/useCreateOrderModal";
 
 export const OrderClientSection = ({
@@ -17,7 +23,9 @@ export const OrderClientSection = ({
     handleCustomerChange,
   } = form;
 
-  const isCustoms = selectedService === "Pengurusan Kepabeanan dan COO";
+  const isCustoms = isCustomsService(selectedService);
+  const isPbm = isPbmService(selectedService);
+  const isRkbm = isRkbmService(selectedService);
 
   return (
     <div className="border border-slate-200 rounded-xl bg-white shadow-2xs">
@@ -118,25 +126,39 @@ export const OrderClientSection = ({
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
-              <strong>Kontrak Terdaftar:</strong> {contractInfo.customerName} •
-              {selectedService === "Jasa PBM" && (
+              <strong>Kontrak Terdaftar:</strong> {contractInfo.customerName} •{" "}
+              <span className="text-emerald-700 font-semibold">
+                [{contractInfo.service || selectedService} •{" "}
+                {contractInfo.location || "Muara Berau"}]
+              </span>
+              {isPbm && (
                 <span>
-                  {" "}Tarif PBM:{" "}
+                  {" "}
+                  • Tarif PBM:{" "}
                   <strong>
-                    Rp {contractInfo.pbmRatePerTon?.toLocaleString("id-ID") || "-"}{" "}
-                    / MT
-                  </strong>
+                    {contractInfo.pbmRatePerTon &&
+                    contractInfo.pbmRatePerTon > 0
+                      ? `Rp ${contractInfo.pbmRatePerTon.toLocaleString("id-ID")} / MT`
+                      : "(Belum diketahui)"}
+                  </strong>{" "}
+                  • PNBP Barang:{" "}
+                  <strong>{contractInfo.pnbpBarangType || "Gratis"}</strong> •
+                  PNBP Pengawasan:{" "}
+                  <strong>{contractInfo.pnbpPengawasanType || "Gratis"}</strong>
                 </span>
               )}
-              {selectedService === "Pengurusan Kepabeanan dan COO" && (
+              {isCustoms && (
                 <span>
-                  {" "}Tarif Kepabeanan:{" "}
+                  {" "}
+                  • Tarif Kepabeanan:{" "}
                   <strong>
-                    Rp {(contractInfo.kepabeananFee || 0).toLocaleString("id-ID")}
+                    Rp{" "}
+                    {(contractInfo.kepabeananFee || 0).toLocaleString("id-ID")}
                   </strong>
                   {contractInfo.cooFee ? (
                     <span>
-                      {" "}• COO:{" "}
+                      {" "}
+                      • COO:{" "}
                       <strong>
                         Rp {contractInfo.cooFee.toLocaleString("id-ID")}
                       </strong>
@@ -144,22 +166,27 @@ export const OrderClientSection = ({
                   ) : null}
                 </span>
               )}
-              {selectedService === "Pengurusan RKBM" && (
+              {isRkbm && (
                 <span>
-                  {" "}Bongkar:{" "}
+                  {" "}
+                  • Bongkar:{" "}
                   <strong>
-                    Rp {(contractInfo.rkbmBongkarFee || 0).toLocaleString("id-ID")}
-                  </strong>
-                  {" "}• Muat:{" "}
+                    Rp{" "}
+                    {(contractInfo.rkbmBongkarFee || 0).toLocaleString("id-ID")}
+                  </strong>{" "}
+                  • Muat:{" "}
                   <strong>
-                    Private FREE / Public Rp {(contractInfo.rkbmMuatPublicFee || 350000).toLocaleString("id-ID")}
+                    Private FREE / Public Rp{" "}
+                    {(contractInfo.rkbmMuatPublicFee || 350000).toLocaleString(
+                      "id-ID",
+                    )}
                   </strong>
                 </span>
               )}
             </span>
           </div>
           <span className="text-[10.5px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold font-mono">
-            Contract Active
+            {contractInfo.location || "Muara Berau"}
           </span>
         </div>
       )}

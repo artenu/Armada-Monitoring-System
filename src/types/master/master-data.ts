@@ -1,3 +1,4 @@
+import type { SubmitEvent } from "react";
 import type { LucideIcon } from "lucide-react";
 import type { CustomerContractRate } from "../finance/financeTypes";
 
@@ -51,10 +52,17 @@ export interface MasterFormData {
 export interface ContractRateFormData {
   customerId: string;
   customerName: string;
+  service?: string;
+  location?: string;
   pbmRatePerTon?: number;
+  pnbpBarangType?: "Gratis" | "Standar" | "Nominal" | string;
+  pnbpPengawasanType?: "Gratis" | "Standar" | "Nominal" | string;
+  pnbpBarangAmount?: number;
+  pnbpPengawasanAmount?: number;
   rkbmBongkarFee?: number;
   rkbmMuatPrivateFee?: number;
   rkbmMuatPublicFee?: number;
+  fenderMooringFee?: number;
   kepabeananFee?: number;
   cooFee?: number;
   notes: string;
@@ -71,4 +79,14 @@ export interface ContractRateTableProps {
   contracts: CustomerContractRate[];
   onEdit: (rate: CustomerContractRate) => void;
   onDelete: (id?: string) => void;
+}
+
+export interface ContractRateModalProps {
+  isOpen: boolean;
+  editingContract: CustomerContractRate | null;
+  customers: MasterItem[];
+  contractForm: ContractRateFormData;
+  onFormChange: (data: ContractRateFormData) => void;
+  onSave: (e: SubmitEvent) => void;
+  onClose: () => void;
 }

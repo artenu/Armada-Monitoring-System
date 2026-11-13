@@ -1,6 +1,10 @@
 import { Anchor } from "lucide-react";
 import { Input, Select } from "@/components/forms";
-import { SHIPMENT_CATEGORY_OPTIONS } from "@/data/mock-data";
+import {
+  SHIPMENT_CATEGORY_OPTIONS,
+  isPbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 import type { UseCreateOrderModalReturn } from "@/features/jobs/hooks/useCreateOrderModal";
 
 export const OrderFleetSection = ({
@@ -18,8 +22,8 @@ export const OrderFleetSection = ({
     selectedService,
   } = form;
 
-  const isPbm = selectedService === "Jasa PBM";
-  const isCustoms = selectedService === "Pengurusan Kepabeanan dan COO";
+  const isPbm = isPbmService(selectedService);
+  const isCustoms = isCustomsService(selectedService);
 
   return (
     <div className="border border-slate-200 rounded-xl bg-white shadow-2xs">
@@ -45,7 +49,9 @@ export const OrderFleetSection = ({
       <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3.5 border-t border-slate-100">
         {/* Mother Vessel: Opsional untuk Kepabeanan & COO, Wajib untuk PBM & RKBM */}
         <Input
-          label={isCustoms ? "Nama Vessel (Opsional)" : "Nama Vessel (Mother Vessel)"}
+          label={
+            isCustoms ? "Nama Vessel (Opsional)" : "Nama Vessel (Mother Vessel)"
+          }
           required={!isCustoms}
           placeholder={isCustoms ? "Boleh dikosongkan..." : "Contoh: MV LARUS"}
           error={errors.vessel?.message}

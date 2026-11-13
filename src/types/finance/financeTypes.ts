@@ -32,6 +32,8 @@ export interface FinanceOrderFields {
   pnbpPengawasanAmount?: number;
   totalPnbpReimbursement?: number;
   totalInvoice?: number;
+  invoiceDocUrl?: string;
+  invoiceDocName?: string;
   accurateSyncNotes?: string;
   sentDate?: string;
   receivedDate?: string;
@@ -55,39 +57,34 @@ export interface InvoicePayload {
   pnbpPengawasanAmount?: number;
   totalPnbpReimbursement?: number;
   totalInvoice: number;
+  invoiceDocUrl?: string;
+  invoiceDocName?: string;
   accurateSyncNotes?: string;
 }
 
 // Data Kontrak Tarif per Customer (Lengkap dengan ID, Catatan, & Status)
+// Data Kontrak Tarif per Layanan & Lokasi Sesuai MOM 11 Nov 2026
 export interface CustomerContractRate {
   id?: string;
   customerId: string;
   customerName: string;
+  service?: string;
+  location?: string;
   pbmRatePerTon?: number;
+  pnbpBarangType?: "Gratis" | "Standar" | "Nominal" | string;
+  pnbpPengawasanType?: "Gratis" | "Standar" | "Nominal" | string;
+  pnbpBarangAmount?: number;
+  pnbpPengawasanAmount?: number;
   rkbmBongkarFee?: number;
   rkbmMuatPrivateFee?: number;
   rkbmMuatPublicFee?: number;
+  fenderMooringFee?: number;
   kepabeananFee?: number;
   cooFee?: number;
+  invoiceDocUrl?: string;
+  invoiceDocName?: string;
   notes?: string;
   status?: "Aktif" | "Nonaktif";
-}
-
-export interface InvoicePayload {
-  invoiceNo: string;
-  invoiceDate: string;
-  dueDate: string;
-  ratePerTon: number;
-  additionalFee?: number;
-  rkbmFee?: number;
-  subtotalJasa?: number;
-  subtotalInvoice?: number;
-  ppnAmount: number;
-  pnbpBarangAmount?: number;
-  pnbpPengawasanAmount?: number;
-  totalPnbpReimbursement?: number;
-  totalInvoice: number;
-  accurateSyncNotes?: string;
 }
 
 export interface ProcessInvoiceModalProps {

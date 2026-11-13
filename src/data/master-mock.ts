@@ -10,7 +10,7 @@ export const MASTER_CONFIGS: Record<
   }
 > = {
   customer: {
-    label: "Customer",
+    label: "Customer & End User",
     prefix: "CUST",
     subDetailLabel: "NPWP",
     subDetailPlaceholder: "Contoh: 01.234.567.8-901.000",
@@ -60,12 +60,12 @@ export const MASTER_CONFIGS: Record<
 };
 
 export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
-  // 1. Customer (6 Customer Selaras dengan Tarif Kontrak)
+  // 1. Customer & End User (9 Perusahaan Sesuai MOM 11 Nov 2026)
   customer: [
     {
       id: "1",
-      kode: "ALFARA",
-      nama: "PT Alfara Delta Persada",
+      kode: "ADP",
+      nama: "PT ADP",
       subDetail: "01.234.567.8-901.000",
       picName: "Bpk. Hendra Gunawan",
       kontak: "0812-3456-7890",
@@ -73,20 +73,74 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
     },
     {
       id: "2",
+      kode: "ACI",
+      nama: "PT ACI",
+      subDetail: "02.345.678.9-012.000",
+      picName: "Bpk. Rahmat",
+      kontak: "0813-1122-3344",
+      status: "Aktif",
+    },
+    {
+      id: "3",
+      kode: "CEP",
+      nama: "PT CEP",
+      subDetail: "04.567.890.1-234.000",
+      picName: "Bpk. Michael Chen",
+      kontak: "0811-5566-7788",
+      status: "Aktif",
+    },
+    {
+      id: "4",
       kode: "AMP",
-      nama: "Armada Maritim Perkasa",
+      nama: "PT AMP",
       subDetail: "05.678.901.2-345.000",
       picName: "Ibu Maya Sari",
       kontak: "0819-2233-4455",
       status: "Aktif",
     },
     {
-      id: "3",
-      kode: "CEP",
-      nama: "Christian Eka Pratama",
-      subDetail: "04.567.890.1-234.000",
-      picName: "Bpk. Michael Chen",
-      kontak: "0811-5566-7788",
+      id: "5",
+      kode: "KS",
+      nama: "PT KS",
+      subDetail: "06.789.012.3-456.000",
+      picName: "Bpk. Bambang",
+      kontak: "0815-9988-7766",
+      status: "Aktif",
+    },
+    {
+      id: "6",
+      kode: "MRM",
+      nama: "PT MRM",
+      subDetail: "07.890.123.4-567.000",
+      picName: "Bpk. Aris",
+      kontak: "0817-4455-6677",
+      status: "Aktif",
+    },
+    {
+      id: "7",
+      kode: "MP",
+      nama: "PT MP",
+      subDetail: "08.901.234.5-678.000",
+      picName: "Ibu Rina",
+      kontak: "0818-3344-5566",
+      status: "Aktif",
+    },
+    {
+      id: "8",
+      kode: "PTB",
+      nama: "PT BUP PTB",
+      subDetail: "09.012.345.6-789.000",
+      picName: "Bpk. Dedi",
+      kontak: "0812-7788-9900",
+      status: "Aktif",
+    },
+    {
+      id: "9",
+      kode: "ZADIN",
+      nama: "PT ZADIN",
+      subDetail: "10.123.456.7-890.000",
+      picName: "Bpk. Zulkifli",
+      kontak: "0811-6677-8899",
       status: "Aktif",
     },
   ],
