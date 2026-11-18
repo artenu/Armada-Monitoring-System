@@ -25,7 +25,7 @@ import type {
 } from "@/types/master/master-data";
 import { INITIAL_MASTER_DATA, MASTER_CONFIGS } from "@/data/master-mock";
 
-const STORAGE_KEY = "gds_master_data_v3";
+const STORAGE_KEY = "gds_master_data_v4";
 
 export const TAB_ITEMS: TabItem[] = [
   { key: "customer", label: "Customer & End User", icon: Users },
@@ -89,19 +89,31 @@ export const useMasterData = () => {
     useState<CustomerContractRate | null>(null);
 
   // Form state khusus Tarif Kontrak
+  // Form state khusus Tarif Kontrak
   const [contractForm, setContractForm] = useState<ContractRateFormData>({
+    contractNo: "",
     customerId: "",
     customerName: "",
     service: "LAYANAN PBM",
     location: "Muara Berau",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: "",
+    isPermanent: true,
     pbmRatePerTon: undefined,
+    chargeUnit: "/MT",
     pnbpBarangType: "Gratis",
     pnbpPengawasanType: "Gratis",
     rkbmBongkarFee: undefined,
+    rkbmBongkarChargeUnit: "/Document",
     rkbmMuatPrivateFee: undefined,
     rkbmMuatPublicFee: undefined,
+    rkbmMuatChargeUnit: "/Document",
+    fenderFee: undefined,
+    mooringFee: undefined,
     kepabeananFee: undefined,
+    kepabeananChargeUnit: "/Document",
     cooFee: undefined,
+    cooChargeUnit: "/Document",
     notes: "",
     status: "Aktif",
   });
@@ -229,14 +241,29 @@ export const useMasterData = () => {
   const handleOpenAddContract = () => {
     setEditingContract(null);
     setContractForm({
+      contractNo: "",
       customerId: "",
       customerName: "",
+      service: "LAYANAN PBM",
+      location: "Muara Berau",
+      startDate: new Date().toISOString().split("T")[0],
+      endDate: "",
+      isPermanent: true,
       pbmRatePerTon: undefined,
+      chargeUnit: "/MT",
+      pnbpBarangType: "Gratis",
+      pnbpPengawasanType: "Gratis",
       rkbmBongkarFee: undefined,
+      rkbmBongkarChargeUnit: "/Document",
       rkbmMuatPrivateFee: undefined,
       rkbmMuatPublicFee: undefined,
+      rkbmMuatChargeUnit: "/Document",
+      fenderFee: undefined,
+      mooringFee: undefined,
       kepabeananFee: undefined,
+      kepabeananChargeUnit: "/Document",
       cooFee: undefined,
+      cooChargeUnit: "/Document",
       notes: "",
       status: "Aktif",
     });
@@ -246,18 +273,30 @@ export const useMasterData = () => {
   const handleOpenEditContract = (rate: CustomerContractRate) => {
     setEditingContract(rate);
     setContractForm({
+      contractNo: rate.contractNo || "",
       customerId: rate.customerId,
       customerName: rate.customerName,
       service: rate.service || "LAYANAN PBM",
       location: rate.location || "Muara Berau",
+      startDate: rate.startDate || "",
+      endDate: rate.endDate || "",
+      isPermanent: rate.isPermanent ?? !rate.endDate,
       pbmRatePerTon: rate.pbmRatePerTon,
+      chargeUnit: rate.chargeUnit || "/MT",
       pnbpBarangType: rate.pnbpBarangType || "Gratis",
       pnbpPengawasanType: rate.pnbpPengawasanType || "Gratis",
       rkbmBongkarFee: rate.rkbmBongkarFee,
+      rkbmBongkarChargeUnit: rate.rkbmBongkarChargeUnit || "/Document",
       rkbmMuatPrivateFee: rate.rkbmMuatPrivateFee,
       rkbmMuatPublicFee: rate.rkbmMuatPublicFee,
+      rkbmMuatChargeUnit: rate.rkbmMuatChargeUnit || "/Document",
+      fenderMooringFee: rate.fenderMooringFee,
+      fenderFee: rate.fenderFee,
+      mooringFee: rate.mooringFee,
       kepabeananFee: rate.kepabeananFee,
+      kepabeananChargeUnit: rate.kepabeananChargeUnit || "/Document",
       cooFee: rate.cooFee,
+      cooChargeUnit: rate.cooChargeUnit || "/Document",
       notes: rate.notes || "",
       status: rate.status || "Aktif",
     });
@@ -266,6 +305,10 @@ export const useMasterData = () => {
 
   const handleSaveContract = (e: FormEvent) => {
     e.preventDefault();
+    if (!contractForm.contractNo.trim()) {
+      alert("Nomor Kontrak wajib diisi.");
+      return;
+    }
     if (!contractForm.customerName.trim()) {
       alert("Nama Customer wajib dipilih.");
       return;
@@ -277,20 +320,37 @@ export const useMasterData = () => {
           c.id === editingContract.id
             ? {
                 ...c,
+                contractNo: contractForm.contractNo.trim(),
                 customerId: contractForm.customerId,
                 customerName: contractForm.customerName,
                 service: contractForm.service,
                 location: contractForm.location,
+                startDate: contractForm.startDate,
+                endDate: contractForm.isPermanent ? "" : contractForm.endDate,
+                isPermanent: contractForm.isPermanent,
                 pbmRatePerTon: contractForm.pbmRatePerTon ?? 0,
+                chargeUnit: contractForm.chargeUnit || "/MT",
                 pnbpBarangType: contractForm.pnbpBarangType,
                 pnbpPengawasanType: contractForm.pnbpPengawasanType,
                 rkbmBongkarFee: contractForm.rkbmBongkarFee ?? 0,
+                rkbmBongkarChargeUnit:
+                  contractForm.rkbmBongkarChargeUnit || "/Document",
                 rkbmMuatPrivateFee: contractForm.rkbmMuatPrivateFee ?? 0,
                 rkbmMuatPublicFee: contractForm.rkbmMuatPublicFee ?? 0,
+                rkbmMuatChargeUnit:
+                  contractForm.rkbmMuatChargeUnit || "/Document",
+                fenderMooringFee:
+                  (contractForm.fenderFee ?? 0) +
+                  (contractForm.mooringFee ?? 0),
+                fenderFee: contractForm.fenderFee ?? 0,
+                mooringFee: contractForm.mooringFee ?? 0,
                 kepabeananFee: contractForm.kepabeananFee ?? 0,
+                kepabeananChargeUnit:
+                  contractForm.kepabeananChargeUnit || "/Document",
                 cooFee: contractForm.cooFee ?? 0,
+                cooChargeUnit: contractForm.cooChargeUnit || "/Document",
                 notes: contractForm.notes.trim(),
-                status: contractForm.status,
+                status: "Aktif", // Otomatis aktif sesuai MOM 16 Nov
               }
             : c,
         ),
@@ -298,22 +358,36 @@ export const useMasterData = () => {
     } else {
       const newRate: CustomerContractRate = {
         id: `RATE-${String(contractRates.length + 1).padStart(3, "0")}`,
+        contractNo: contractForm.contractNo.trim(),
         customerId:
           contractForm.customerId.trim() ||
           contractForm.customerName.toUpperCase().slice(0, 6),
         customerName: contractForm.customerName.trim(),
         service: contractForm.service,
         location: contractForm.location,
+        startDate: contractForm.startDate,
+        endDate: contractForm.isPermanent ? "" : contractForm.endDate,
+        isPermanent: contractForm.isPermanent,
         pbmRatePerTon: contractForm.pbmRatePerTon ?? 0,
+        chargeUnit: contractForm.chargeUnit || "/MT",
         pnbpBarangType: contractForm.pnbpBarangType,
         pnbpPengawasanType: contractForm.pnbpPengawasanType,
         rkbmBongkarFee: contractForm.rkbmBongkarFee ?? 0,
+        rkbmBongkarChargeUnit:
+          contractForm.rkbmBongkarChargeUnit || "/Document",
         rkbmMuatPrivateFee: contractForm.rkbmMuatPrivateFee ?? 0,
         rkbmMuatPublicFee: contractForm.rkbmMuatPublicFee ?? 0,
+        rkbmMuatChargeUnit: contractForm.rkbmMuatChargeUnit || "/Document",
+        fenderMooringFee:
+          (contractForm.fenderFee ?? 0) + (contractForm.mooringFee ?? 0),
+        fenderFee: contractForm.fenderFee ?? 0,
+        mooringFee: contractForm.mooringFee ?? 0,
         kepabeananFee: contractForm.kepabeananFee ?? 0,
+        kepabeananChargeUnit: contractForm.kepabeananChargeUnit || "/Document",
         cooFee: contractForm.cooFee ?? 0,
+        cooChargeUnit: contractForm.cooChargeUnit || "/Document",
         notes: contractForm.notes.trim(),
-        status: contractForm.status,
+        status: "Aktif", // Otomatis aktif sesuai MOM 16 Nov
       };
       setContractRates((prev) => [...prev, newRate]);
     }

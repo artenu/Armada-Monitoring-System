@@ -89,8 +89,8 @@ export const ContractRateTable = ({
               <option value="LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR">
                 LAYANAN RKBM MUAT/BONGKAR
               </option>
-              <option value="LAYANAN JASA VENDER & MURING">
-                LAYANAN JASA VENDER & MURING
+              <option value="LAYANAN JASA FENDER & MOORING">
+                LAYANAN JASA FENDER & MOORING
               </option>
               <option value="JASA PENGAWASAN KEPABEANAN & COO">
                 JASA PENGAWASAN KEPABEANAN & COO
@@ -167,17 +167,35 @@ export const ContractRateTable = ({
                     const isCustoms =
                       cr.service?.includes("KEPABEANAN") ||
                       cr.service?.includes("COO");
-
+                    const isFenderMooring =
+                      cr.service?.includes("FENDER") ||
+                      cr.service?.includes("MOORING");
                     return (
                       <TR key={cr.id || cr.customerId}>
                         <TD>
-                          <span className="font-bold text-slate-900 block">
-                            {cr.customerName}
-                          </span>
-                          <span className="text-[10.5px] font-mono text-slate-400">
-                            {cr.id || cr.customerId}
-                            {cr.notes ? ` • ${cr.notes}` : ""}
-                          </span>
+                          <div className="space-y-1">
+                            <span className="font-bold text-slate-900 block">
+                              {cr.customerName}
+                            </span>
+                            {cr.contractNo && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                                No: {cr.contractNo}
+                              </span>
+                            )}
+                            <div className="text-[10px] text-slate-500">
+                              Masa Berlaku:{" "}
+                              <span className="font-medium text-slate-700">
+                                {cr.startDate ? cr.startDate : "Awal"} s/d{" "}
+                                {cr.isPermanent
+                                  ? "Selamanya"
+                                  : cr.endDate || "Selesai"}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-400 block">
+                              ID: {cr.id || cr.customerId}
+                              {cr.notes ? ` • ${cr.notes}` : ""}
+                            </span>
+                          </div>
                         </TD>
                         <TD>
                           <Badge
@@ -205,7 +223,10 @@ export const ContractRateTable = ({
                             <div>
                               {cr.pbmRatePerTon && cr.pbmRatePerTon > 0 ? (
                                 <span className="font-bold text-slate-900">
-                                  {formatRupiah(cr.pbmRatePerTon)} / MT
+                                  {formatRupiah(cr.pbmRatePerTon)}{" "}
+                                  <span className="text-slate-500 font-sans text-[11px]">
+                                    {cr.chargeUnit || "/ MT"}
+                                  </span>
                                 </span>
                               ) : (
                                 <span className="text-amber-600 italic font-sans font-medium">
@@ -214,38 +235,86 @@ export const ContractRateTable = ({
                               )}
                             </div>
                           )}
+
                           {isRkbm && (
                             <div className="space-y-0.5 text-[11px]">
                               <div>
                                 Bongkar:{" "}
-                                {cr.rkbmBongkarFee
-                                  ? formatRupiah(cr.rkbmBongkarFee)
-                                  : "(Belum diketahui)"}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.rkbmBongkarFee
+                                    ? formatRupiah(cr.rkbmBongkarFee)
+                                    : "-"}
+                                </span>{" "}
+                                <span className="text-slate-500 font-sans text-[10px]">
+                                  {cr.rkbmBongkarChargeUnit || "/Document"}
+                                </span>
                               </div>
                               <div>
                                 Muat:{" "}
-                                {cr.rkbmMuatPublicFee
-                                  ? formatRupiah(cr.rkbmMuatPublicFee)
-                                  : "(Belum diketahui)"}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.rkbmMuatPublicFee
+                                    ? formatRupiah(cr.rkbmMuatPublicFee)
+                                    : "-"}
+                                </span>{" "}
+                                <span className="text-slate-500 font-sans text-[10px]">
+                                  {cr.rkbmMuatChargeUnit || "/Document"}
+                                </span>
                               </div>
                             </div>
                           )}
+
+                          {isFenderMooring && (
+                            <div className="space-y-0.5 text-[11px]">
+                              <div>
+                                Fender:{" "}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.fenderFee
+                                    ? formatRupiah(cr.fenderFee)
+                                    : "-"}
+                                </span>
+                              </div>
+                              <div>
+                                Mooring:{" "}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.mooringFee
+                                    ? formatRupiah(cr.mooringFee)
+                                    : "-"}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           {isCustoms && (
                             <div className="space-y-0.5 text-[11px]">
                               <div>
                                 Pabean:{" "}
-                                {cr.kepabeananFee
-                                  ? formatRupiah(cr.kepabeananFee)
-                                  : "-"}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.kepabeananFee
+                                    ? formatRupiah(cr.kepabeananFee)
+                                    : "-"}
+                                </span>{" "}
+                                <span className="text-slate-500 font-sans text-[10px]">
+                                  {cr.kepabeananChargeUnit || "/Document"}
+                                </span>
                               </div>
                               <div>
-                                COO: {cr.cooFee ? formatRupiah(cr.cooFee) : "-"}
+                                COO:{" "}
+                                <span className="font-semibold text-slate-900">
+                                  {cr.cooFee ? formatRupiah(cr.cooFee) : "-"}
+                                </span>{" "}
+                                <span className="text-slate-500 font-sans text-[10px]">
+                                  {cr.cooChargeUnit || "/Document"}
+                                </span>
                               </div>
                             </div>
                           )}
-                          {!isPbm && !isRkbm && !isCustoms && (
-                            <span className="text-slate-400">-</span>
-                          )}
+
+                          {!isPbm &&
+                            !isRkbm &&
+                            !isFenderMooring &&
+                            !isCustoms && (
+                              <span className="text-slate-400">-</span>
+                            )}
                         </TD>
 
                         {/* PNBP Jasa Barang */}

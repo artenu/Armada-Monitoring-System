@@ -5,7 +5,7 @@ import type { OrderItem } from "@/types";
 export const SERVICE_OPTIONS = [
   "LAYANAN PBM",
   "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR",
-  "LAYANAN JASA VENDER & MURING",
+  "LAYANAN JASA FENDER & MOORING",
   "JASA PENGAWASAN KEPABEANAN & COO",
 ] as const;
 
@@ -20,8 +20,8 @@ export const isRkbmService = (service?: string) =>
   service === "Pengurusan RKBM";
 
 export const isFenderMooringService = (service?: string) =>
-  service === "LAYANAN JASA VENDER & MURING" ||
-  service === "Jasa Vender & Muring";
+  service === "LAYANAN JASA FENDER & MOORING" ||
+  service === "Jasa fender & Mooring";
 
 export const isCustomsService = (service?: string) =>
   service === "JASA PENGAWASAN KEPABEANAN & COO" ||
@@ -36,7 +36,7 @@ export const CUSTOMER_END_USER_OPTIONS = [
   "PT MRM",
   "PT MP",
   "PT BUP PTB",
-  "PT ZADIN",
+  "PT ZMA",
 ] as const;
 
 export const CUSTOMER_OPTIONS = CUSTOMER_END_USER_OPTIONS;

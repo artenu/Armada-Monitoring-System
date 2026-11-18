@@ -16,9 +16,22 @@ export const ContractRateModal = ({
     return null;
   }
 
-  const isPbm = contractForm.service === "LAYANAN PBM";
+  // Poin 1 MOM 16 Nov: Default selalu fallback ke LAYANAN PBM jika falsy
+  const isPbm = !contractForm.service || contractForm.service === "LAYANAN PBM";
   const isRkbm = contractForm.service?.includes("RKBM");
-  const isCustoms = contractForm.service?.includes("KEPABEANAN");
+  const isFenderMooring =
+    contractForm.service?.includes("FENDER") ||
+    contractForm.service?.includes("MOORING");
+  const isCustoms =
+    contractForm.service?.includes("KEPABEANAN") ||
+    contractForm.service?.includes("COO");
+
+  // Opsi Satuan Charge
+  const chargeUnitOptions = [
+    { label: "Per MT (/MT)", value: "/MT" },
+    { label: "Per Dokumen (/Document)", value: "/Document" },
+    { label: "Lumpsum (/Lumpsum)", value: "/Lumpsum" },
+  ];
 
   return (
     <Modal
@@ -30,8 +43,27 @@ export const ContractRateModal = ({
           ? "Edit Tarif Kontrak Customer"
           : "Tambah Tarif Kontrak Baru"
       }
-      maxWidth="xl">
+      maxWidth="2xl">
       <form onSubmit={onSave} className="p-5 space-y-4 text-xs">
+        {/* Poin 3 MOM 16 Nov: Input No Kontrak Manual */}
+        <div className="p-3 bg-red-50/40 border border-red-200/80 rounded-xl space-y-2">
+          <Input
+            required
+            label="Nomor Kontrak *"
+            placeholder="Contoh: CTR/GDS-PTB/XI/2026/001"
+            value={contractForm.contractNo || ""}
+            onChange={(e) =>
+              onFormChange({
+                ...contractForm,
+                contractNo: e.target.value,
+              })
+            }
+          />
+          <span className="text-[11px] text-slate-500 block">
+            Nomor kontrak wajib diisi manual sebelum menentukan tarif layanan.
+          </span>
+        </div>
+
         {/* Customer Info */}
         {editingContract ? (
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
@@ -60,17 +92,23 @@ export const ContractRateModal = ({
               value={contractForm.customerName}
               onChange={(e) => {
                 const name = e.target.value;
-                const matched = customers.find((c) => c.nama === name);
+                const matched = customers.find(
+                  (c) => c.nama === name || c.namaLengkap === name,
+                );
                 onFormChange({
                   ...contractForm,
                   customerName: name,
-                  customerId: matched ? matched.kode : name.toUpperCase(),
+                  customerId: matched
+                    ? matched.kode
+                    : name.toUpperCase().slice(0, 4),
                 });
               }}
               options={[
                 { label: "Pilih Customer", value: "" },
                 ...customers.map((c) => ({
-                  label: `${c.nama} (${c.kode})`,
+                  label: c.namaLengkap
+                    ? `${c.nama} - ${c.namaLengkap} (${c.kode})`
+                    : `${c.nama} (${c.kode})`,
                   value: c.nama,
                 })),
               ]}
@@ -91,7 +129,67 @@ export const ContractRateModal = ({
           </div>
         )}
 
-        {/* Pemilihan Layanan & Lokasi Sesuai MOM 11 Nov 2026 */}
+        {/* Poin 5 MOM 16 Nov: Masa Berlaku Kontrak */}
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+          <span className="font-bold text-slate-800 block">
+            Masa Berlaku Kontrak
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                Tanggal Mulai Kontrak
+              </label>
+              <input
+                type="date"
+                required
+                value={contractForm.startDate || ""}
+                onChange={(e) =>
+                  onFormChange({ ...contractForm, startDate: e.target.value })
+                }
+                className="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-red-500"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer pb-2">
+                <input
+                  type="checkbox"
+                  checked={contractForm.isPermanent ?? true}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...contractForm,
+                      isPermanent: e.target.checked,
+                      endDate: e.target.checked ? "" : contractForm.endDate,
+                    })
+                  }
+                  className="rounded border-slate-300 text-red-600 focus:ring-red-500"
+                />
+                <span className="text-xs font-medium text-slate-700">
+                  Berlaku Selamanya (Tanpa Batas Akhir)
+                </span>
+              </label>
+
+              {!contractForm.isPermanent && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    Tanggal Selesai Kontrak
+                  </label>
+                  <input
+                    type="date"
+                    required={!contractForm.isPermanent}
+                    value={contractForm.endDate || ""}
+                    onChange={(e) =>
+                      onFormChange({ ...contractForm, endDate: e.target.value })
+                    }
+                    className="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Pemilihan Layanan & Lokasi */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Select
             label="Layanan"
@@ -106,8 +204,8 @@ export const ContractRateModal = ({
                 value: "LAYANAN RKBM MUAT/BONGKAR/MUAT & BONGKAR",
               },
               {
-                label: "LAYANAN JASA VENDER & MURING",
-                value: "LAYANAN JASA VENDER & MURING",
+                label: "LAYANAN JASA FENDER & MOORING",
+                value: "LAYANAN JASA FENDER & MOORING",
               },
               {
                 label: "JASA PENGAWASAN KEPABEANAN & COO",
@@ -129,129 +227,223 @@ export const ContractRateModal = ({
           />
         </div>
 
-        {/* Seksi Jasa PBM */}
+        {/* Seksi Jasa PBM (Poin 1 & 2 MOM 16 Nov) */}
         {isPbm && (
-          <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-xl space-y-2">
+          <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-xl space-y-3">
             <span className="font-bold text-emerald-900 block">
               Tarif Jasa PBM (Stevedoring) & PNBP
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <NumberInput
-                label="Tarif per Ton (Rp / MT)"
-                placeholder="Contoh: 11000"
-                prefix="Rp"
-                suffix="/ MT"
-                value={contractForm.pbmRatePerTon}
-                onChange={(val) =>
-                  onFormChange({ ...contractForm, pbmRatePerTon: val })
-                }
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2">
+                <NumberInput
+                  label="Tarif Jasa PBM"
+                  placeholder="Contoh: 11000"
+                  prefix="Rp"
+                  value={contractForm.pbmRatePerTon}
+                  onChange={(val) =>
+                    onFormChange({ ...contractForm, pbmRatePerTon: val })
+                  }
+                />
+              </div>
 
+              {/* Poin 2 MOM 16 Nov: Validasi Satuan Charge */}
               <Select
-                label="Status PNBP Barang & Pengawasan"
-                value={contractForm.pnbpBarangType || "Gratis"}
+                label="Satuan Charge"
+                value={contractForm.chargeUnit || "/MT"}
                 onChange={(e) =>
-                  onFormChange({
-                    ...contractForm,
-                    pnbpBarangType: e.target.value,
-                    pnbpPengawasanType: e.target.value,
-                  })
+                  onFormChange({ ...contractForm, chargeUnit: e.target.value })
                 }
-                options={[
-                  { label: "GRATIS (BUP PTB dsb)", value: "Gratis" },
-                  { label: "Standar Kas Negara", value: "Standar" },
-                ]}
+                options={chargeUnitOptions}
               />
             </div>
+
+            <Select
+              label="Status PNBP Barang & Pengawasan"
+              value={contractForm.pnbpBarangType || "Gratis"}
+              onChange={(e) =>
+                onFormChange({
+                  ...contractForm,
+                  pnbpBarangType: e.target.value,
+                  pnbpPengawasanType: e.target.value,
+                })
+              }
+              options={[
+                { label: "GRATIS (BUP PTB dsb)", value: "Gratis" },
+                { label: "Standar Kas Negara", value: "Standar" },
+              ]}
+            />
           </div>
         )}
 
-        {/* Seksi Pengurusan RKBM */}
+        {/* Seksi Pengurusan RKBM (Poin 1 RKBM MOM 16 Nov) */}
         {isRkbm && (
           <div className="p-3 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3">
             <span className="font-bold text-amber-900 block">
               Fee Dokumen RKBM
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <NumberInput
-                label="RKBM Bongkar (Rp)"
-                placeholder="Contoh: 500.000"
-                prefix="Rp"
-                value={contractForm.rkbmBongkarFee}
-                onChange={(val) =>
-                  onFormChange({ ...contractForm, rkbmBongkarFee: val })
-                }
-              />
-              <NumberInput
-                label="RKBM Muat (Rp)"
-                placeholder="Contoh: 350.000"
-                prefix="Rp"
-                value={contractForm.rkbmMuatPublicFee}
-                onChange={(val) =>
-                  onFormChange({ ...contractForm, rkbmMuatPublicFee: val })
-                }
-              />
+            <div className="space-y-3">
+              {/* RKBM Bongkar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <NumberInput
+                    label="RKBM Bongkar (Rp)"
+                    placeholder="Contoh: 500.000"
+                    prefix="Rp"
+                    value={contractForm.rkbmBongkarFee}
+                    onChange={(val) =>
+                      onFormChange({ ...contractForm, rkbmBongkarFee: val })
+                    }
+                  />
+                </div>
+                <Select
+                  label="Satuan Charge Bongkar"
+                  value={contractForm.rkbmBongkarChargeUnit || "/Document"}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...contractForm,
+                      rkbmBongkarChargeUnit: e.target.value,
+                    })
+                  }
+                  options={chargeUnitOptions}
+                />
+              </div>
+
+              {/* RKBM Muat */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <NumberInput
+                    label="RKBM Muat (Rp)"
+                    placeholder="Contoh: 350.000"
+                    prefix="Rp"
+                    value={contractForm.rkbmMuatPublicFee}
+                    onChange={(val) =>
+                      onFormChange({ ...contractForm, rkbmMuatPublicFee: val })
+                    }
+                  />
+                </div>
+                <Select
+                  label="Satuan Charge Muat"
+                  value={contractForm.rkbmMuatChargeUnit || "/Document"}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...contractForm,
+                      rkbmMuatChargeUnit: e.target.value,
+                    })
+                  }
+                  options={chargeUnitOptions}
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Seksi Kepabeanan & COO */}
-        {isCustoms && (
-          <div className="p-3 bg-indigo-50/50 border border-indigo-200 rounded-xl space-y-2">
-            <span className="font-bold text-indigo-900 block">
-              Jasa Kepabeanan & COO
+        {/* Seksi Fender & Mooring (Poin 1 Jasa Fender & Mooring MOM 16 Nov) */}
+        {isFenderMooring && (
+          <div className="p-3 bg-cyan-50/50 border border-cyan-200 rounded-xl space-y-3">
+            <span className="font-bold text-cyan-900 block">
+              Tarif Layanan Jasa Fender & Mooring
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <NumberInput
-                label="Fee Kepabeanan (Rp)"
-                placeholder="Contoh: 12.000.000"
+                label="Biaya Jasa Fender (Rp)"
+                placeholder="Contoh: 5.000.000"
                 prefix="Rp"
-                value={contractForm.kepabeananFee}
+                value={contractForm.fenderFee}
                 onChange={(val) =>
-                  onFormChange({ ...contractForm, kepabeananFee: val })
+                  onFormChange({ ...contractForm, fenderFee: val })
                 }
               />
               <NumberInput
-                label="Fee COO (Rp)"
-                placeholder="Contoh: 2.000.000"
+                label="Biaya Jasa Mooring (Rp)"
+                placeholder="Contoh: 3.000.000"
                 prefix="Rp"
-                value={contractForm.cooFee}
+                value={contractForm.mooringFee}
                 onChange={(val) =>
-                  onFormChange({ ...contractForm, cooFee: val })
+                  onFormChange({ ...contractForm, mooringFee: val })
                 }
               />
+            </div>
+            <span className="text-[11px] text-slate-500 italic block">
+              Catatan: Layanan Fender & Mooring tidak dikenakan satuan charge
+              khusus sesuai MOM 16 Nov.
+            </span>
+          </div>
+        )}
+
+        {/* Seksi Kepabeanan & COO (Poin 2 MOM 16 Nov) */}
+        {isCustoms && (
+          <div className="p-3 bg-indigo-50/50 border border-indigo-200 rounded-xl space-y-3">
+            <span className="font-bold text-indigo-900 block">
+              Jasa Pengawasan Kepabeanan & COO
+            </span>
+            <div className="space-y-3">
+              {/* Fee Kepabeanan */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <NumberInput
+                    label="Fee Kepabeanan (Rp)"
+                    placeholder="Contoh: 12.000.000"
+                    prefix="Rp"
+                    value={contractForm.kepabeananFee}
+                    onChange={(val) =>
+                      onFormChange({ ...contractForm, kepabeananFee: val })
+                    }
+                  />
+                </div>
+                <Select
+                  label="Satuan Charge Kepabeanan"
+                  value={contractForm.kepabeananChargeUnit || "/Document"}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...contractForm,
+                      kepabeananChargeUnit: e.target.value,
+                    })
+                  }
+                  options={chargeUnitOptions}
+                />
+              </div>
+
+              {/* Fee COO */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <NumberInput
+                    label="Fee COO (Rp)"
+                    placeholder="Contoh: 2.000.000"
+                    prefix="Rp"
+                    value={contractForm.cooFee}
+                    onChange={(val) =>
+                      onFormChange({ ...contractForm, cooFee: val })
+                    }
+                  />
+                </div>
+                <Select
+                  label="Satuan Charge COO"
+                  value={contractForm.cooChargeUnit || "/Document"}
+                  onChange={(e) =>
+                    onFormChange({
+                      ...contractForm,
+                      cooChargeUnit: e.target.value,
+                    })
+                  }
+                  options={chargeUnitOptions}
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Catatan & Status */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="sm:col-span-2">
-            <Input
-              label="Catatan Kontrak / Referensi MOM"
-              placeholder="Contoh: MOM 11 Nov 2026 - Muara Berau"
-              value={contractForm.notes}
-              onChange={(e) =>
-                onFormChange({
-                  ...contractForm,
-                  notes: e.target.value,
-                })
-              }
-            />
-          </div>
-          <Select
-            label="Status"
-            value={contractForm.status}
+        {/* Catatan (Poin 4 MOM 16 Nov: Status dihapus dari input, otomatis Aktif) */}
+        <div>
+          <Input
+            label="Catatan Kontrak / Referensi MOM"
+            placeholder="Contoh: MOM 16 Nov 2026 - Muara Berau"
+            value={contractForm.notes}
             onChange={(e) =>
               onFormChange({
                 ...contractForm,
-                status: e.target.value as "Aktif" | "Nonaktif",
+                notes: e.target.value,
               })
             }
-            options={[
-              { label: "Aktif", value: "Aktif" },
-              { label: "Nonaktif", value: "Nonaktif" },
-            ]}
           />
         </div>
 

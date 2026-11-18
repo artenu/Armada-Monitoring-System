@@ -58,7 +58,22 @@ export const MasterItemTable = ({
                 <TD className="font-mono text-slate-500 font-medium">
                   {item.kode}
                 </TD>
-                <TD className="font-bold text-slate-900">{item.nama}</TD>
+                <TD>
+                  <div className="space-y-0.5">
+                    {item.namaLengkap && (
+                      <span className="font-bold text-slate-900 block">
+                        {item.namaLengkap}
+                      </span>
+                    )}
+                    {item.bidangUsaha && (
+                      <span
+                        className="text-[10px] text-slate-400 block line-clamp-1 italic"
+                        title={item.bidangUsaha}>
+                        {item.bidangUsaha}
+                      </span>
+                    )}
+                  </div>
+                </TD>
                 <TD className="text-slate-600">{item.subDetail || "-"}</TD>
                 <TD className="text-slate-600">{item.kontak || "-"}</TD>
                 {activeTab === "customer" && (

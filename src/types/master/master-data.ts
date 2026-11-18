@@ -23,7 +23,9 @@ export interface TabItem {
 export interface MasterItem {
   id: string;
   kode: string;
-  nama: string;
+  nama: string; // Nama Singkatan / Nama di Tabel (contoh: PT ADP)
+  namaLengkap?: string; // Nama Lengkap Resmi Perusahaan (contoh: PT Alfara Delta Persada)
+  bidangUsaha?: string; // Bidang Usaha & Wilayah Operasi
   subDetail?: string; // NPWP (Customer), Owner/HP (Tug), Feet (Barge), Keterangan Area (Lokasi)
   kontak?: string; // No HP / Telepon PIC
   picName?: string; // Khusus Customer: Nama Lengkap PIC
@@ -31,7 +33,6 @@ export interface MasterItem {
   npwpDocUrl?: string; // URL dokumen PDF NPWP
   status: "Aktif" | "Nonaktif";
 }
-
 export interface MasterConfig {
   label: string;
   prefix: string;
@@ -50,21 +51,43 @@ export interface MasterFormData {
 }
 
 export interface ContractRateFormData {
+  contractNo: string; // Wajib diisi manual
   customerId: string;
   customerName: string;
   service?: string;
   location?: string;
+
+  // Periode Kontrak
+  startDate?: string;
+  endDate?: string;
+  isPermanent?: boolean;
+
+  // PBM
   pbmRatePerTon?: number;
+  chargeUnit?: string;
   pnbpBarangType?: "Gratis" | "Standar" | "Nominal" | string;
   pnbpPengawasanType?: "Gratis" | "Standar" | "Nominal" | string;
   pnbpBarangAmount?: number;
   pnbpPengawasanAmount?: number;
+
+  // RKBM
   rkbmBongkarFee?: number;
+  rkbmBongkarChargeUnit?: string;
   rkbmMuatPrivateFee?: number;
   rkbmMuatPublicFee?: number;
+  rkbmMuatChargeUnit?: string;
+
+  // Fender & Mooring
   fenderMooringFee?: number;
+  fenderFee?: number;
+  mooringFee?: number;
+
+  // Kepabeanan & COO
   kepabeananFee?: number;
+  kepabeananChargeUnit?: string;
   cooFee?: number;
+  cooChargeUnit?: string;
+
   notes: string;
   status: "Aktif" | "Nonaktif";
 }
