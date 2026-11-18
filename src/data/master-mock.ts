@@ -61,11 +61,15 @@ export const MASTER_CONFIGS: Record<
 
 export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
   // 1. Customer & End User (9 Perusahaan Sesuai MOM 11 Nov 2026)
+  // 1. Customer & End User (9 Perusahaan Lengkap Sesuai MOM 16 Nov 2026)
   customer: [
     {
       id: "1",
       kode: "ADP",
       nama: "PT ADP",
+      namaLengkap: "PT Alfara Delta Persada",
+      bidangUsaha:
+        "Pertambangan batu bara di Kec. Anggana, Kutai Kartanegara, Kaltim (anak usaha PT Alfa Energi Investama Tbk).",
       subDetail: "01.234.567.8-901.000",
       picName: "Bpk. Hendra Gunawan",
       kontak: "0812-3456-7890",
@@ -75,6 +79,9 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
       id: "2",
       kode: "ACI",
       nama: "PT ACI",
+      namaLengkap: "PT Anugerah Covindo Indonesia",
+      bidangUsaha:
+        "Pertambangan & kontraktor batu bara di wilayah Kalimantan Timur.",
       subDetail: "02.345.678.9-012.000",
       picName: "Bpk. Rahmat",
       kontak: "0813-1122-3344",
@@ -84,6 +91,9 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
       id: "3",
       kode: "CEP",
       nama: "PT CEP",
+      namaLengkap: "PT Cristian Eka Pratama",
+      bidangUsaha:
+        "Pemegang konsesi tambang batu bara di Kutai Barat, Kaltim (anak usaha PT Petrosea Tbk).",
       subDetail: "04.567.890.1-234.000",
       picName: "Bpk. Michael Chen",
       kontak: "0811-5566-7788",
@@ -93,6 +103,8 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
       id: "4",
       kode: "AMP",
       nama: "PT AMP",
+      namaLengkap: "PT Anugrah Mining Persada",
+      bidangUsaha: "Pertambangan batu bara di wilayah Kutai, Kalimantan Timur.",
       subDetail: "05.678.901.2-345.000",
       picName: "Ibu Maya Sari",
       kontak: "0819-2233-4455",
@@ -100,8 +112,11 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
     },
     {
       id: "5",
-      kode: "KS",
+      kode: "KDS", // Kode 3 huruf untuk PT Kedap Sayaaq
       nama: "PT KS",
+      namaLengkap: "PT Kedap Sayaaq",
+      bidangUsaha:
+        "Pertambangan batu bara di Kabupaten Kutai Barat, Kalimantan Timur.",
       subDetail: "06.789.012.3-456.000",
       picName: "Bpk. Bambang",
       kontak: "0815-9988-7766",
@@ -111,6 +126,9 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
       id: "6",
       kode: "MRM",
       nama: "PT MRM",
+      namaLengkap: "PT Melawi Rimba Minerals",
+      bidangUsaha:
+        "Sektor pertambangan mineral/batu bara (grup Indika Energy); atau keagenan kapal jika berperan sebagai agen (shipping agency).",
       subDetail: "07.890.123.4-567.000",
       picName: "Bpk. Aris",
       kontak: "0817-4455-6677",
@@ -118,8 +136,11 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
     },
     {
       id: "7",
-      kode: "MP",
+      kode: "MTP", // Kode 3 huruf untuk PT Mitratama Perkasa
       nama: "PT MP",
+      namaLengkap: "PT Mitratama Perkasa",
+      bidangUsaha:
+        "Infrastruktur pelabuhan batu bara, crushing, dan coal barging di Kalimantan (afiliasi Astrindo / Sumber Energi Andalan).",
       subDetail: "08.901.234.5-678.000",
       picName: "Ibu Rina",
       kontak: "0818-3344-5566",
@@ -129,6 +150,9 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
       id: "8",
       kode: "PTB",
       nama: "PT BUP PTB",
+      namaLengkap: "PT Pelabuhan Tiga Bersaudara",
+      bidangUsaha:
+        "Badan Usaha Pelabuhan (BUP) pengelola terminal alih muat (transshipment) kapal & tongkang di Perairan Muara Berau, Kaltim.",
       subDetail: "09.012.345.6-789.000",
       picName: "Bpk. Dedi",
       kontak: "0812-7788-9900",
@@ -136,8 +160,11 @@ export const INITIAL_MASTER_DATA: Record<MasterResourceKey, MasterItem[]> = {
     },
     {
       id: "9",
-      kode: "ZADIN",
+      kode: "ZMA",
       nama: "PT ZADIN",
+      namaLengkap: "PT Zadin Mitra Abadi",
+      bidangUsaha:
+        "Perusahaan Bongkar Muat (PBM) & keagenan kapal/tongkang yang berbasis di Samarinda, Kaltim.",
       subDetail: "10.123.456.7-890.000",
       picName: "Bpk. Zulkifli",
       kontak: "0811-6677-8899",

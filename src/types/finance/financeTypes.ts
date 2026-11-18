@@ -64,23 +64,46 @@ export interface InvoicePayload {
 
 // Data Kontrak Tarif per Customer (Lengkap dengan ID, Catatan, & Status)
 // Data Kontrak Tarif per Layanan & Lokasi Sesuai MOM 11 Nov 2026
+// Data Kontrak Tarif per Layanan & Lokasi Sesuai MOM 11 & 16 Nov 2026
 export interface CustomerContractRate {
   id?: string;
+  contractNo?: string; // MOM 16 Nov: Nomor Kontrak Manual
   customerId: string;
   customerName: string;
   service?: string;
   location?: string;
+
+  // Periode Kontrak (MOM 16 Nov)
+  startDate?: string;
+  endDate?: string;
+  isPermanent?: boolean; // Berlaku Selamanya
+
+  // Jasa PBM & Satuan Charge
   pbmRatePerTon?: number;
+  chargeUnit?: string; // "/MT" | "/Document" | "/Lumpsum"
   pnbpBarangType?: "Gratis" | "Standar" | "Nominal" | string;
   pnbpPengawasanType?: "Gratis" | "Standar" | "Nominal" | string;
   pnbpBarangAmount?: number;
   pnbpPengawasanAmount?: number;
+
+  // Jasa RKBM (MOM 16 Nov: Muat & Bongkar ada satuan charge masing-masing)
   rkbmBongkarFee?: number;
+  rkbmBongkarChargeUnit?: string; // "/MT" | "/Document" | "/Lumpsum"
   rkbmMuatPrivateFee?: number;
   rkbmMuatPublicFee?: number;
+  rkbmMuatChargeUnit?: string; // "/MT" | "/Document" | "/Lumpsum"
+
+  // Jasa Fender & Mooring (MOM 16 Nov: dipisah)
   fenderMooringFee?: number;
+  fenderFee?: number;
+  mooringFee?: number;
+
+  // Jasa Kepabeanan & COO
   kepabeananFee?: number;
+  kepabeananChargeUnit?: string; // "/MT" | "/Document" | "/Lumpsum"
   cooFee?: number;
+  cooChargeUnit?: string; // "/MT" | "/Document" | "/Lumpsum"
+
   invoiceDocUrl?: string;
   invoiceDocName?: string;
   notes?: string;
