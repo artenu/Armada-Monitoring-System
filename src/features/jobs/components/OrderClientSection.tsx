@@ -6,6 +6,7 @@ import {
   isCustomsService,
   isPbmService,
   isRkbmService,
+  isFenderMooringService,
 } from "@/data/mock-data";
 import type { UseCreateOrderModalReturn } from "@/features/jobs/hooks/useCreateOrderModal";
 
@@ -26,6 +27,7 @@ export const OrderClientSection = ({
   const isCustoms = isCustomsService(selectedService);
   const isPbm = isPbmService(selectedService);
   const isRkbm = isRkbmService(selectedService);
+  const isFenderMooring = isFenderMooringService(selectedService);
 
   return (
     <div className="border border-slate-200 rounded-xl bg-white shadow-2xs">
@@ -122,68 +124,100 @@ export const OrderClientSection = ({
 
       {/* Banner Tarif Kontrak Customer (Jika Terdeteksi) */}
       {contractInfo && (
-        <div className="mx-4 mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center justify-between">
+        <div className="mx-4 mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>
-              <strong>Kontrak Terdaftar:</strong> {contractInfo.customerName} •{" "}
-              <span className="text-emerald-700 font-semibold">
-                [{contractInfo.service || selectedService} •{" "}
-                {contractInfo.location || "Muara Berau"}]
-              </span>
-              {isPbm && (
-                <span>
-                  {" "}
-                  • Tarif PBM:{" "}
-                  <strong>
-                    {contractInfo.pbmRatePerTon &&
-                    contractInfo.pbmRatePerTon > 0
-                      ? `Rp ${contractInfo.pbmRatePerTon.toLocaleString("id-ID")} / MT`
-                      : "(Belum diketahui)"}
-                  </strong>{" "}
-                  • PNBP Barang:{" "}
-                  <strong>{contractInfo.pnbpBarangType || "Gratis"}</strong> •
-                  PNBP Pengawasan:{" "}
-                  <strong>{contractInfo.pnbpPengawasanType || "Gratis"}</strong>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <strong>Kontrak Terdaftar:</strong> {contractInfo.customerName}
+                {contractInfo.contractNo && (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-emerald-200/80 text-emerald-950 border border-emerald-300">
+                    No: {contractInfo.contractNo}
+                  </span>
+                )}
+                <span className="text-emerald-700 font-semibold">
+                  [{contractInfo.service || selectedService} •{" "}
+                  {contractInfo.location || "Muara Berau"}]
                 </span>
-              )}
-              {isCustoms && (
-                <span>
-                  {" "}
-                  • Tarif Kepabeanan:{" "}
-                  <strong>
-                    Rp{" "}
-                    {(contractInfo.kepabeananFee || 0).toLocaleString("id-ID")}
-                  </strong>
-                  {contractInfo.cooFee ? (
-                    <span>
-                      {" "}
-                      • COO:{" "}
-                      <strong>
-                        Rp {contractInfo.cooFee.toLocaleString("id-ID")}
-                      </strong>
-                    </span>
-                  ) : null}
+              </div>
+              <div className="text-[11px] text-emerald-800">
+                Masa Berlaku:{" "}
+                <span className="font-medium">
+                  {contractInfo.startDate || "Awal"} s/d{" "}
+                  {contractInfo.isPermanent
+                    ? "Selamanya"
+                    : contractInfo.endDate || "Selesai"}
                 </span>
-              )}
-              {isRkbm && (
-                <span>
-                  {" "}
-                  • Bongkar:{" "}
-                  <strong>
-                    Rp{" "}
-                    {(contractInfo.rkbmBongkarFee || 0).toLocaleString("id-ID")}
-                  </strong>{" "}
-                  • Muat:{" "}
-                  <strong>
-                    Private FREE / Public Rp{" "}
-                    {(contractInfo.rkbmMuatPublicFee || 350000).toLocaleString(
-                      "id-ID",
-                    )}
-                  </strong>
-                </span>
-              )}
-            </span>
+                {isPbm && (
+                  <span>
+                    {" "}
+                    • Tarif PBM:{" "}
+                    <strong>
+                      {contractInfo.pbmRatePerTon &&
+                      contractInfo.pbmRatePerTon > 0
+                        ? `Rp ${contractInfo.pbmRatePerTon.toLocaleString("id-ID")} ${contractInfo.chargeUnit || "/ MT"}`
+                        : "(Belum diketahui)"}
+                    </strong>{" "}
+                    • PNBP:{" "}
+                    <strong>{contractInfo.pnbpBarangType || "Gratis"}</strong>
+                  </span>
+                )}
+                {isCustoms && (
+                  <span>
+                    {" "}
+                    • Tarif Kepabeanan:{" "}
+                    <strong>
+                      Rp{" "}
+                      {(contractInfo.kepabeananFee || 0).toLocaleString(
+                        "id-ID",
+                      )}
+                    </strong>
+                    {contractInfo.cooFee ? (
+                      <span>
+                        {" "}
+                        • COO:{" "}
+                        <strong>
+                          Rp {contractInfo.cooFee.toLocaleString("id-ID")}
+                        </strong>
+                      </span>
+                    ) : null}
+                  </span>
+                )}
+                {isRkbm && (
+                  <span>
+                    {" "}
+                    • Bongkar:{" "}
+                    <strong>
+                      Rp{" "}
+                      {(contractInfo.rkbmBongkarFee || 0).toLocaleString(
+                        "id-ID",
+                      )}
+                    </strong>{" "}
+                    • Muat:{" "}
+                    <strong>
+                      Rp{" "}
+                      {(
+                        contractInfo.rkbmMuatPublicFee || 350000
+                      ).toLocaleString("id-ID")}
+                    </strong>
+                  </span>
+                )}
+                {isFenderMooring && (
+                  <span>
+                    {" "}
+                    • Fender:{" "}
+                    <strong>
+                      Rp {(contractInfo.fenderFee || 0).toLocaleString("id-ID")}
+                    </strong>{" "}
+                    • Mooring:{" "}
+                    <strong>
+                      Rp{" "}
+                      {(contractInfo.mooringFee || 0).toLocaleString("id-ID")}
+                    </strong>
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
           <span className="text-[10.5px] px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold font-mono">
             {contractInfo.location || "Muara Berau"}
