@@ -1,9 +1,14 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import type { OrderItem, OperationalUpdatePayload } from "@/types";
 import {
   getMasterAgentList,
   getMasterLocationList,
 } from "@/data/operational-data";
+import {
+  isPbmService,
+  isRkbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 interface UseUpdateRkbmModalProps {
   order: OrderItem;
@@ -19,10 +24,9 @@ export const useUpdateRkbmModal = ({
   const [locationList] = useState<string[]>(() => getMasterLocationList());
   const [agentList] = useState<string[]>(() => getMasterAgentList());
 
-  const isRkbm = order.service === "Pengurusan RKBM";
-  const isPbm = order.service === "Jasa PBM";
-  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
-
+  const isRkbm = isRkbmService(order.service);
+  const isPbm = isPbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
   // Koordinasi Lapangan
   const [captainPhone, setCaptainPhone] = useState<string>(
     order.captainPhone || "",
@@ -33,13 +37,13 @@ export const useUpdateRkbmModal = ({
 
   // Logika adaptif berdasarkan pilihan Sales
   const showMuat =
-    order.service !== "Pengurusan RKBM" ||
+    !isRkbm ||
     order.rkbmType === "Muat" ||
     order.rkbmType === "Muat & Bongkar" ||
     !order.rkbmType;
 
   const showBongkar =
-    order.service !== "Pengurusan RKBM" ||
+    !isRkbm ||
     order.rkbmType === "Bongkar" ||
     order.rkbmType === "Muat & Bongkar" ||
     !order.rkbmType;
@@ -109,32 +113,42 @@ export const useUpdateRkbmModal = ({
   const [pebFile, setPebFile] = useState<File | null>(null);
   const [cooFile, setCooFile] = useState<File | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const parsedDsr = finalDsr.trim()
       ? parseFloat(finalDsr.replace(/\./g, "").replace(",", "."))
       : undefined;
 
-    // Evaluasi Trigger Finance otomatis
+    // Evaluasi Trigger Finance otomatis & Deteksi Tipe RKBM
     let isFinanceReady = false;
+    let determinedRkbmType: "Muat" | "Bongkar" | "Muat & Bongkar" =
+      order.rkbmType || "Muat";
 
     if (isRkbm) {
       const hasMuat = Boolean(
         rkbmMuatFile || order.rkbmMuatDocName || order.rkbmDocName,
       );
       const hasBongkar = Boolean(rkbmBongkarFile || order.rkbmBongkarDocName);
-      if (order.rkbmType === "Muat & Bongkar") {
-        isFinanceReady = hasMuat && hasBongkar;
-      } else if (order.rkbmType === "Bongkar") {
-        isFinanceReady = hasBongkar;
+
+      if (hasMuat && hasBongkar) {
+        determinedRkbmType = "Muat & Bongkar";
+        isFinanceReady = true;
+      } else if (hasBongkar && !hasMuat) {
+        determinedRkbmType = "Bongkar";
+        isFinanceReady = true;
+      } else if (hasMuat && !hasBongkar) {
+        determinedRkbmType = "Muat";
+        isFinanceReady = true;
       } else {
-        isFinanceReady = hasMuat;
+        isFinanceReady = false;
       }
     } else if (isPbm) {
       const hasSof = Boolean(sofFile || order.sofDocName);
       const hasFender = Boolean(fenderFile || order.fenderDocName);
-      const hasStaleweight = Boolean(staleweightFile || order.staleweightDocName);
+      const hasStaleweight = Boolean(
+        staleweightFile || order.staleweightDocName,
+      );
       const hasFinalDsrDoc = Boolean(finalDsrFile || order.finalDsrDocName);
       const hasNoDamage = Boolean(noDamageFile || order.noDamageDocName);
       isFinanceReady =
@@ -182,6 +196,7 @@ export const useUpdateRkbmModal = ({
       bargeNomination: order.bargeNomination,
       shipmentType: order.shipmentType,
       status: calculatedStatus,
+      rkbmType: isRkbm ? determinedRkbmType : order.rkbmType,
 
       // Dokumen Trigger RKBM
       rkbmMuatDocName: rkbmMuatFile

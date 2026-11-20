@@ -3,6 +3,9 @@ import {
   SERVICE_OPTIONS,
   END_USER_OPTIONS,
   SHIPMENT_CATEGORY_OPTIONS,
+  isCustomsService,
+  isPbmService,
+  isRkbmService,
 } from "@/data/mock-data";
 import type { UseEditJobReturn } from "@/features/jobs/hooks/useEditJob";
 
@@ -20,9 +23,9 @@ export const EditJobForm = ({ state }: { state: UseEditJobReturn }) => {
     selectedIncludeCoo,
   } = state;
 
-  const isCustoms = selectedService === "Pengurusan Kepabeanan dan COO";
-  const isPbm = selectedService === "Jasa PBM";
-  const isRkbm = selectedService === "Pengurusan RKBM";
+  const isCustoms = isCustomsService(selectedService);
+  const isPbm = isPbmService(selectedService);
+  const isRkbm = isRkbmService(selectedService);
 
   return (
     <form

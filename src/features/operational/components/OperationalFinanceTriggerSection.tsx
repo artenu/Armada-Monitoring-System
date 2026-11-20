@@ -1,5 +1,10 @@
 import { FileText, Upload, X, CheckCircle2, ShieldCheck } from "lucide-react";
 import type { OrderItem } from "@/types";
+import {
+  isPbmService,
+  isRkbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 export interface OperationalFinanceTriggerSectionProps {
   order: OrderItem;
@@ -47,9 +52,9 @@ export const OperationalFinanceTriggerSection = ({
   cooFile,
   setCooFile,
 }: OperationalFinanceTriggerSectionProps) => {
-  const isRkbm = order.service === "Pengurusan RKBM";
-  const isPbm = order.service === "Jasa PBM";
-  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
+  const isRkbm = isRkbmService(order.service);
+  const isPbm = isPbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
 
   const renderFileInput = (
     label: string,
@@ -120,26 +125,55 @@ export const OperationalFinanceTriggerSection = ({
           </p>
         </div>
 
-        {/* 1. LAYANAN RKBM */}
+        {/* 1. LAYANAN RKBM: Sediakan Form Upload Muat & Bongkar Sekaligus */}
         {isRkbm && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {(order.rkbmType === "Muat" ||
-              order.rkbmType === "Muat & Bongkar" ||
-              !order.rkbmType) &&
-              renderFileInput(
+          <div className="space-y-3">
+            {/* Banner Indikator Deteksi Berkas Live */}
+            <div className="flex items-center justify-between p-2.5 bg-amber-50/80 border border-amber-200 rounded-lg text-xs">
+              <span className="text-amber-900 font-medium">
+                Tipe RKBM Terdeteksi:{" "}
+                <strong className="text-slate-900">
+                  {(rkbmMuatFile ||
+                    order.rkbmMuatDocName ||
+                    order.rkbmDocName) &&
+                  (rkbmBongkarFile || order.rkbmBongkarDocName)
+                    ? "RKBM Muat & Bongkar (2 Dokumen)"
+                    : rkbmBongkarFile || order.rkbmBongkarDocName
+                      ? "RKBM Bongkar Saja (1 Dokumen)"
+                      : rkbmMuatFile ||
+                          order.rkbmMuatDocName ||
+                          order.rkbmDocName
+                        ? "RKBM Muat Saja (1 Dokumen)"
+                        : "Menunggu Unggah Dokumen SK"}
+                </strong>
+              </span>
+              <span className="text-[10.5px] px-2 py-0.5 rounded font-bold font-mono bg-white text-slate-700 border border-slate-200">
+                {(rkbmMuatFile || order.rkbmMuatDocName || order.rkbmDocName) &&
+                (rkbmBongkarFile || order.rkbmBongkarDocName)
+                  ? "Muat & Bongkar"
+                  : rkbmBongkarFile || order.rkbmBongkarDocName
+                    ? "Bongkar"
+                    : "Muat"}
+              </span>
+            </div>
+
+            {/* Dua Kolom Form Upload: Muat & Bongkar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {renderFileInput(
                 "Dokumen SK RKBM Muat (KSOP)",
                 rkbmMuatFile,
                 setRkbmMuatFile,
                 order.rkbmMuatDocName || order.rkbmDocName,
+                false,
               )}
-            {(order.rkbmType === "Bongkar" ||
-              order.rkbmType === "Muat & Bongkar") &&
-              renderFileInput(
+              {renderFileInput(
                 "Dokumen SK RKBM Bongkar (KSOP)",
                 rkbmBongkarFile,
                 setRkbmBongkarFile,
                 order.rkbmBongkarDocName,
+                false,
               )}
+            </div>
           </div>
         )}
 

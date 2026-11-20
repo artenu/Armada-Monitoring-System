@@ -105,7 +105,6 @@ export const useCreateOrderModal = ({
       data,
       spFile,
       rkbmFile,
-      rkbmBongkarFile,
       suratPenunjukanFile,
       suratPermohonanFile,
       suratPernyataanFile,

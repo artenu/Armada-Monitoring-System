@@ -91,7 +91,10 @@ export const buildNewOrder = (
       | "Domestik"
       | "Impor",
     service: data.service,
-    rkbmType: (data.rkbmType || "Muat") as "Bongkar" | "Muat",
+    rkbmType: (data.rkbmType || "Muat") as
+      | "Bongkar"
+      | "Muat"
+      | "Muat & Bongkar",
     rkbmDocName: files.rkbmDocName,
     rkbmDocUrl: files.rkbmDocUrl,
     rkbmBongkarDocName: files.rkbmBongkarDocName,

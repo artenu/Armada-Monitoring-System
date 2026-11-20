@@ -135,7 +135,6 @@ export interface ValidateFilesParams {
   data: OrderFormData;
   spFile: File | null;
   rkbmFile: File | null;
-  rkbmBongkarFile: File | null;
   suratPenunjukanFile?: File | null;
   suratPermohonanFile?: File | null;
   suratPernyataanFile?: File | null;

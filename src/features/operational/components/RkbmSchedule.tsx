@@ -1,6 +1,11 @@
 import { MapPin, Calendar, Scale, Activity, Clock } from "lucide-react";
 import { Input, Select } from "@/components/forms";
 import type { RkbmScheduleSectionProps } from "@/types";
+import {
+  isPbmService,
+  isRkbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 export const RkbmScheduleSection = ({
   order,
@@ -22,9 +27,9 @@ export const RkbmScheduleSection = ({
   operationalNotes,
   onOperationalNotesChange,
 }: RkbmScheduleSectionProps) => {
-  const isRkbm = order.service === "Pengurusan RKBM";
-  const isPbm = order.service === "Jasa PBM";
-  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
+  const isRkbm = isRkbmService(order.service);
+  const isPbm = isPbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
 
   return (
     <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
@@ -88,7 +93,11 @@ export const RkbmScheduleSection = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <Input
               type="date"
-              label={isPbm ? "Mulai Commenced (Komen Slot)" : "Tanggal Mulai Commenced"}
+              label={
+                isPbm
+                  ? "Mulai Commenced (Komen Slot)"
+                  : "Tanggal Mulai Commenced"
+              }
               startIcon={Calendar}
               value={commencedDate}
               onChange={(e) => onCommencedDateChange?.(e.target.value)}
