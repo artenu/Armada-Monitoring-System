@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { UseEditJobReturn } from "@/features/jobs/hooks/useEditJob";
 import { DocumentViewer } from "@/components/ui";
+import { isRkbmService, isCustomsService } from "@/data/mock-data";
 
 export const EditJobDocumentPreview = ({
   state,
@@ -17,16 +18,35 @@ export const EditJobDocumentPreview = ({
   const { order, previewUrl, previewName, isEditable, handleFileChange } =
     state;
 
-  // State tab aktif untuk 3 dokumen KSOP pada order RKBM
+  // State tab dokumen aktif untuk layanan RKBM
   const [activeRkbmTab, setActiveRkbmTab] = useState<
-    "penunjukan" | "permohonan" | "pernyataan"
-  >("penunjukan");
+    "penunjukan" | "permohonan" | "pernyataan" | "rkbmMuat" | "rkbmBongkar"
+  >(() => {
+    if (order?.rkbmSuratPenunjukanDocUrl) {
+      return "penunjukan";
+    }
+    if (order?.rkbmSuratPermohonanDocUrl) {
+      return "permohonan";
+    }
+    if (order?.rkbmSuratPernyataanDocUrl) {
+      return "pernyataan";
+    }
+    if (order?.rkbmMuatDocUrl || order?.rkbmDocUrl) {
+      return "rkbmMuat";
+    }
+    if (order?.rkbmBongkarDocUrl) {
+      return "rkbmBongkar";
+    }
+    return "penunjukan";
+  });
 
   if (!order) {
     return null;
   }
 
-  const isRkbm = order.service === "Pengurusan RKBM";
+  // Gunakan helper standar agar cocok dengan nama layanan baru
+  const isRkbm = isRkbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
 
   // Tentukan file URL & nama yang aktif untuk dipratinjau
   let currentUrl = previewUrl;
@@ -45,12 +65,19 @@ export const EditJobDocumentPreview = ({
       currentUrl = order.rkbmSuratPernyataanDocUrl || "";
       currentName =
         order.rkbmSuratPernyataanDocName || "3_Surat_Pernyataan.pdf";
+    } else if (activeRkbmTab === "rkbmMuat") {
+      currentUrl = order.rkbmMuatDocUrl || order.rkbmDocUrl || "";
+      currentName =
+        order.rkbmMuatDocName || order.rkbmDocName || "SK_RKBM_Muat.pdf";
+    } else if (activeRkbmTab === "rkbmBongkar") {
+      currentUrl = order.rkbmBongkarDocUrl || "";
+      currentName = order.rkbmBongkarDocName || "SK_RKBM_Bongkar.pdf";
     }
   }
 
   const headerTitle = isRkbm
-    ? "Berkas Permohonan KSOP"
-    : order.service === "Pengurusan Kepabeanan dan COO"
+    ? "Berkas Persyaratan RKBM (KSOP)"
+    : isCustoms
       ? "Dokumen Kepabeanan / PEB"
       : "Surat Penunjukan (SI / SP)";
 
@@ -110,42 +137,83 @@ export const EditJobDocumentPreview = ({
         </div>
       </div>
 
-      {/* Selector 3 Dokumen Persyaratan KSOP Khusus Layanan RKBM */}
+      {/* Selector Seluruh Dokumen RKBM */}
       {isRkbm && (
         <div className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100/90 border-b border-slate-200 text-xs overflow-x-auto">
           <span className="text-[11px] font-bold text-slate-500 shrink-0">
-            Dokumen KSOP:
+            Pilih Berkas:
           </span>
+
           <button
             type="button"
             onClick={() => setActiveRkbmTab("penunjukan")}
-            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap ${
+            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap flex items-center gap-1 ${
               activeRkbmTab === "penunjukan"
                 ? "bg-slate-900 text-white shadow-xs"
                 : "bg-white text-slate-600 hover:bg-slate-200/70 border border-slate-200"
             }`}>
-            1. Penunjukan
+            <span>1. Penunjukan</span>
+            {Boolean(order.rkbmSuratPenunjukanDocUrl) && (
+              <span className="text-emerald-400 font-bold">✓</span>
+            )}
           </button>
+
           <button
             type="button"
             onClick={() => setActiveRkbmTab("permohonan")}
-            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap ${
+            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap flex items-center gap-1 ${
               activeRkbmTab === "permohonan"
                 ? "bg-slate-900 text-white shadow-xs"
                 : "bg-white text-slate-600 hover:bg-slate-200/70 border border-slate-200"
             }`}>
-            2. Permohonan
+            <span>2. Permohonan</span>
+            {Boolean(order.rkbmSuratPermohonanDocUrl) && (
+              <span className="text-emerald-400 font-bold">✓</span>
+            )}
           </button>
+
           <button
             type="button"
             onClick={() => setActiveRkbmTab("pernyataan")}
-            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap ${
+            className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap flex items-center gap-1 ${
               activeRkbmTab === "pernyataan"
                 ? "bg-slate-900 text-white shadow-xs"
                 : "bg-white text-slate-600 hover:bg-slate-200/70 border border-slate-200"
             }`}>
-            3. Pernyataan
+            <span>3. Pernyataan</span>
+            {Boolean(order.rkbmSuratPernyataanDocUrl) && (
+              <span className="text-emerald-400 font-bold">✓</span>
+            )}
           </button>
+
+          {/* Tab Tambahan jika SK RKBM sudah diterbitkan/diupload di operasional */}
+          {Boolean(order.rkbmMuatDocUrl || order.rkbmDocUrl) && (
+            <button
+              type="button"
+              onClick={() => setActiveRkbmTab("rkbmMuat")}
+              className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap flex items-center gap-1 ${
+                activeRkbmTab === "rkbmMuat"
+                  ? "bg-emerald-800 text-white shadow-xs"
+                  : "bg-white text-emerald-700 hover:bg-emerald-50 border border-emerald-300"
+              }`}>
+              <span>SK RKBM Muat</span>
+              <span className="font-bold">✓</span>
+            </button>
+          )}
+
+          {Boolean(order.rkbmBongkarDocUrl) && (
+            <button
+              type="button"
+              onClick={() => setActiveRkbmTab("rkbmBongkar")}
+              className={`px-2.5 py-1 rounded-lg font-semibold text-[11px] cursor-pointer transition-all whitespace-nowrap flex items-center gap-1 ${
+                activeRkbmTab === "rkbmBongkar"
+                  ? "bg-emerald-800 text-white shadow-xs"
+                  : "bg-white text-emerald-700 hover:bg-emerald-50 border border-emerald-300"
+              }`}>
+              <span>SK RKBM Bongkar</span>
+              <span className="font-bold">✓</span>
+            </button>
+          )}
         </div>
       )}
 

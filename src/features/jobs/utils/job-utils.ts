@@ -1,5 +1,9 @@
 import type { OrderItem, JobStats } from "@/types";
-import type { OrderFormData } from "../schema/order-schema";
+import {
+  getContractRateByCustomerAndService,
+  getContractRateByCustomer,
+} from "@/data/pricing-data";
+import type { OrderFormData } from "@/features/jobs/schema/order-schema";
 
 /**
  * 1. Hitung 4 Metrik KPI Cepat Divisi Sales
@@ -22,7 +26,9 @@ export const filterJobs = (
   orders: OrderItem[],
   searchQuery: string,
 ): OrderItem[] => {
-  if (!searchQuery.trim()) {return orders;}
+  if (!searchQuery.trim()) {
+    return orders;
+  }
   const q = searchQuery.toLowerCase();
 
   return orders.filter(
@@ -60,6 +66,17 @@ export const buildNewOrder = (
       ? `${data.tugBoat} / ${data.bargeNomination}`
       : data.tugBoat || data.bargeNomination || "Menunggu Plotting Tongkang";
 
+  // Lookup Kontrak Aktif Sesuai Layanan & Lokasi
+  const location = data.pol?.toLowerCase().includes("jawa")
+    ? "Muara Jawa"
+    : "Muara Berau";
+  const contract =
+    getContractRateByCustomerAndService(
+      data.customer,
+      data.service,
+      location,
+    ) || getContractRateByCustomer(data.customer);
+
   return {
     id: `JOB-2026-${String(orderCount + 1).padStart(3, "0")}`,
     rkbmNo: "-",
@@ -69,9 +86,15 @@ export const buildNewOrder = (
     shipmentType: data.shipmentType || "Batu Bara",
     customer: data.customer,
     endUser: data.endUser || "-",
-    activityType: (data.activityType || "Domestik") as "Ekspor" | "Domestik" | "Impor",
+    activityType: (data.activityType || "Domestik") as
+      | "Ekspor"
+      | "Domestik"
+      | "Impor",
     service: data.service,
-    rkbmType: (data.rkbmType || "Muat") as "Bongkar" | "Muat",
+    rkbmType: (data.rkbmType || "Muat") as
+      | "Bongkar"
+      | "Muat"
+      | "Muat & Bongkar",
     rkbmDocName: files.rkbmDocName,
     rkbmDocUrl: files.rkbmDocUrl,
     rkbmBongkarDocName: files.rkbmBongkarDocName,
@@ -83,7 +106,9 @@ export const buildNewOrder = (
     rkbmSuratPernyataanDocName: files.rkbmSuratPernyataanDocName,
     rkbmSuratPernyataanDocUrl: files.rkbmSuratPernyataanDocUrl,
     includeCoo: data.includeCoo,
-    spotRateAmount: data.spotRateAmount ? Number(data.spotRateAmount) : undefined,
+    spotRateAmount: data.spotRateAmount
+      ? Number(data.spotRateAmount)
+      : undefined,
     spDocName: files.spDocName,
     spDocUrl: files.spDocUrl,
     pol: data.pol,
@@ -95,6 +120,14 @@ export const buildNewOrder = (
     customRatePerTon: data.customRatePerTon
       ? Number(data.customRatePerTon)
       : undefined,
+    // Integrasi Master Kontrak ke Order Baru
+    contractNo: data.rateType === "Contract" ? contract?.contractNo : undefined,
+    chargeUnit: contract?.chargeUnit,
+    fenderFee: contract?.fenderFee,
+    mooringFee: contract?.mooringFee,
+    fenderMooringFee:
+      (contract?.fenderFee ?? 0) + (contract?.mooringFee ?? 0) ||
+      contract?.fenderMooringFee,
     startDate: data.startDate,
     estimatedTonnage: Number(data.estimatedTonnage.replace(/\./g, "")) || 0,
     customerPic: data.customerPic,

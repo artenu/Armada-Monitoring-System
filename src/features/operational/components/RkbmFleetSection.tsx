@@ -2,6 +2,11 @@ import { Lock, Phone, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { Input, Select } from "@/components/forms";
 import type { RkbmFleetSectionProps } from "@/types";
+import {
+  isRkbmService,
+  isPbmService,
+  isCustomsService,
+} from "@/data/mock-data";
 
 export const RkbmFleetSection = ({
   order,
@@ -11,9 +16,9 @@ export const RkbmFleetSection = ({
   onAgentChange,
   agentOptions,
 }: RkbmFleetSectionProps) => {
-  const isRkbm = order.service === "Pengurusan RKBM";
-  const isPbm = order.service === "Jasa PBM";
-  const isCustoms = order.service === "Pengurusan Kepabeanan dan COO";
+  const isRkbm = isRkbmService(order.service);
+  const isPbm = isPbmService(order.service);
+  const isCustoms = isCustomsService(order.service);
 
   return (
     <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">

@@ -39,6 +39,11 @@ export interface FinanceOrderFields {
   receivedDate?: string;
   paymentDate?: string;
   paymentNotes?: string;
+  fenderFee?: number;
+  mooringFee?: number;
+  fenderMooringFee?: number;
+  contractNo?: string;
+  chargeUnit?: string;
 }
 
 export interface InvoicePayload {
@@ -60,6 +65,11 @@ export interface InvoicePayload {
   invoiceDocUrl?: string;
   invoiceDocName?: string;
   accurateSyncNotes?: string;
+  fenderFee?: number;
+  mooringFee?: number;
+  fenderMooringFee?: number;
+  contractNo?: string;
+  chargeUnit?: string;
 }
 
 // Data Kontrak Tarif per Customer (Lengkap dengan ID, Catatan, & Status)

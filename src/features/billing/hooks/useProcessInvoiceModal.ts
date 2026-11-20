@@ -1,10 +1,15 @@
 import { useState, useMemo, type SubmitEvent, type ChangeEvent } from "react";
 import type { ProcessInvoiceModalProps } from "@/types";
-import { getContractRateByCustomer, calculatePnbp } from "@/data/pricing-data";
+import {
+  getContractRateByCustomer,
+  calculatePnbp,
+  getContractRateByCustomerAndService,
+} from "@/data/pricing-data";
 import {
   isPbmService,
   isRkbmService,
   isCustomsService,
+  isFenderMooringService,
 } from "@/data/mock-data";
 
 export const useProcessInvoiceModal = ({
@@ -15,14 +20,24 @@ export const useProcessInvoiceModal = ({
   // 1. Tonase Acuan (DSR Final atau Estimasi)
   const tonase = order.finalDsr || order.estimatedTonnage || 0;
 
-  // 2. Deteksi Tarif Kontrak Customer
+  // 2. Deteksi Tarif Kontrak Customer Presisi
   const contract = useMemo(() => {
-    return getContractRateByCustomer(order.customer);
-  }, [order.customer]);
+    const location = order.pol?.toLowerCase().includes("jawa")
+      ? "Muara Jawa"
+      : "Muara Berau";
+    return (
+      getContractRateByCustomerAndService(
+        order.customer,
+        order.service,
+        location,
+      ) || getContractRateByCustomer(order.customer)
+    );
+  }, [order.customer, order.service, order.pol]);
 
   const isPbm = isPbmService(order.service);
   const isRkbm = isRkbmService(order.service);
   const isCustoms = isCustomsService(order.service);
+  const isFenderMooring = isFenderMooringService(order.service);
 
   // 3. Kalkulasi Otomatis di Belakang Layar (Tanpa Input Manual)
   // A. Tarif Satuan PBM
@@ -50,10 +65,17 @@ export const useProcessInvoiceModal = ({
     order.ratePerTon,
   ]);
 
-  // B. Subtotal Jasa PBM
+  // Subtotal Jasa PBM (memperhatikan satuan charge /MT vs /Lumpsum)
   const jasaPbm = useMemo(() => {
+    if (!isPbm) {
+      return 0;
+    }
+    const unit = order.chargeUnit || contract?.chargeUnit || "/MT";
+    if (unit === "/Lumpsum" || unit === "/Document") {
+      return ratePerTon;
+    }
     return Math.round(tonase * ratePerTon);
-  }, [tonase, ratePerTon]);
+  }, [isPbm, tonase, ratePerTon, order.chargeUnit, contract?.chargeUnit]);
 
   // C. Fee RKBM
   const rkbmFee = useMemo(() => {
@@ -108,7 +130,42 @@ export const useProcessInvoiceModal = ({
     return contract?.cooFee ?? 2000000;
   }, [isCustoms, order.includeCoo, contract]);
 
+  // Fee Fender & Mooring (MOM 16 Nov)
+  const fenderFee = useMemo(() => {
+    if (!isFenderMooring) {
+      return 0;
+    }
+    return order.fenderFee ?? contract?.fenderFee ?? 0;
+  }, [isFenderMooring, order.fenderFee, contract?.fenderFee]);
+
+  const mooringFee = useMemo(() => {
+    if (!isFenderMooring) {
+      return 0;
+    }
+    return order.mooringFee ?? contract?.mooringFee ?? 0;
+  }, [isFenderMooring, order.mooringFee, contract?.mooringFee]);
+
+  const fenderMooringFee = useMemo(() => {
+    if (!isFenderMooring) {
+      return 0;
+    }
+    if (order.fenderMooringFee !== undefined) {
+      return order.fenderMooringFee;
+    }
+    if (fenderFee > 0 || mooringFee > 0) {
+      return fenderFee + mooringFee;
+    }
+    return contract?.fenderMooringFee ?? 0;
+  }, [
+    isFenderMooring,
+    order.fenderMooringFee,
+    fenderFee,
+    mooringFee,
+    contract?.fenderMooringFee,
+  ]);
+
   // E. Subtotal Seluruh Jasa (DPP)
+  // Subtotal Seluruh Jasa (DPP)
   const subtotalJasa = useMemo(() => {
     if (isPbm) {
       return jasaPbm;
@@ -119,8 +176,21 @@ export const useProcessInvoiceModal = ({
     if (isCustoms) {
       return kepabeananFee + cooFee;
     }
+    if (isFenderMooring) {
+      return fenderMooringFee;
+    }
     return 0;
-  }, [isPbm, jasaPbm, isRkbm, rkbmFee, isCustoms, kepabeananFee, cooFee]);
+  }, [
+    isPbm,
+    jasaPbm,
+    isRkbm,
+    rkbmFee,
+    isCustoms,
+    kepabeananFee,
+    cooFee,
+    isFenderMooring,
+    fenderMooringFee,
+  ]);
 
   // F. PPN 11% Otomatis Diproses di Belakang Layar
   const ppn = useMemo(() => {
@@ -188,16 +258,21 @@ export const useProcessInvoiceModal = ({
       invoiceNo,
       invoiceDate,
       dueDate,
+      contractNo: order.contractNo || contract?.contractNo,
+      chargeUnit: order.chargeUnit || contract?.chargeUnit,
       ratePerTon,
-      rkbmFee,
-      kepabeananFee,
-      cooFee,
       subtotalJasa,
       subtotalInvoice: subtotalJasa,
       ppnAmount: ppn,
       pnbpBarangAmount: pnbpCalc.pnbpBarang,
       pnbpPengawasanAmount: pnbpCalc.pnbpPengawasan,
       totalPnbpReimbursement: totalPnbp,
+      rkbmFee: isRkbm ? rkbmFee : undefined,
+      kepabeananFee: isCustoms ? kepabeananFee : undefined,
+      cooFee: isCustoms ? cooFee : undefined,
+      fenderFee: isFenderMooring ? fenderFee : undefined,
+      mooringFee: isFenderMooring ? mooringFee : undefined,
+      fenderMooringFee: isFenderMooring ? fenderMooringFee : undefined,
       totalInvoice: grandTotal,
       invoiceDocUrl,
       invoiceDocName,
@@ -211,6 +286,10 @@ export const useProcessInvoiceModal = ({
     isPbm,
     isRkbm,
     isCustoms,
+    isFenderMooring,
+    fenderFee,
+    mooringFee,
+    fenderMooringFee,
     isPnbpGratis,
     invoiceNo,
     setInvoiceNo,

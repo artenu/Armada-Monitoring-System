@@ -11,8 +11,10 @@ import {
 } from "@/components/ui";
 import { formatRupiah, angkaTerbilang } from "@/utils/formatters";
 import type { InvoiceSlipModalProps } from "@/types";
+import { isPbmService } from "@/data/mock-data";
 
 export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
+  const isPbm = isPbmService(order.service);
   const tonase = order.finalDsr || order.estimatedTonnage || 0;
   const rate = order.ratePerTon || 250;
   const jasaPbm = Math.round(tonase * rate);
@@ -104,6 +106,12 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                 </span>
               </div>
               <div className="flex justify-between sm:justify-end gap-3">
+                <span className="text-slate-500">No. Kontrak:</span>
+                <span className="font-mono font-medium text-slate-800">
+                  {order.contractNo || "-"}
+                </span>
+              </div>
+              <div className="flex justify-between sm:justify-end gap-3">
                 <span className="text-slate-500">No. RKBM:</span>
                 <span className="font-mono font-medium">
                   {order.rkbmNo || "-"}
@@ -153,13 +161,16 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
               </THead>
               <TBody className="divide-y divide-slate-100 font-mono">
                 {/* 1. Baris Jasa PBM */}
-                {order.service === "Jasa PBM" && Boolean(jasaPbm) && (
+                {isPbm && Boolean(jasaPbm) && (
                   <TR className="hover:bg-transparent">
                     <TD className="py-2.5 px-3 font-sans">
-                      Jasa Bongkar Muat ({order.shipmentType || "Batu Bara"}) - Final DSR
+                      Jasa Bongkar Muat ({order.shipmentType || "Batu Bara"}) -
+                      Final DSR
                     </TD>
                     <TD className="py-2.5 px-3 text-right">
-                      {tonase.toLocaleString("id-ID")} MT
+                      {order.chargeUnit === "/Lumpsum"
+                        ? "1 Paket"
+                        : `${tonase.toLocaleString("id-ID")} MT`}
                     </TD>
                     <TD className="py-2.5 px-3 text-right">
                       {formatRupiah(rate)}
@@ -190,7 +201,7 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                   </TR>
                 )}
 
-                {order.service === "Jasa PBM" && Boolean(order.pnbpBarangAmount) && (
+                {isPbm && Boolean(order.pnbpBarangAmount) && (
                   <TR className="text-slate-600 hover:bg-transparent">
                     <TD className="py-2 px-3 font-sans italic">
                       Reimbursement: PNBP Barang ({order.activityType})
@@ -205,7 +216,7 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                   </TR>
                 )}
 
-                {order.service === "Jasa PBM" && Boolean(order.pnbpPengawasanAmount) && (
+                {isPbm && Boolean(order.pnbpPengawasanAmount) && (
                   <TR className="text-slate-600 hover:bg-transparent">
                     <TD className="py-2 px-3 font-sans italic">
                       Reimbursement: PNBP Pengawasan Bongkar Muat (@ Rp 54/MT)
@@ -251,6 +262,56 @@ export const InvoiceSlipModal = ({ order, onClose }: InvoiceSlipModalProps) => {
                     </TD>
                   </TR>
                 )}
+
+                {/* Baris Jasa Fender */}
+                {Boolean(order.fenderFee) && (
+                  <TR className="hover:bg-transparent">
+                    <TD className="py-2.5 px-3 font-sans">
+                      Jasa Penyediaan & Pemasangan Fender Kapal
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right">1 Paket</TD>
+                    <TD className="py-2.5 px-3 text-right">
+                      {formatRupiah(order.fenderFee)}
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right font-semibold">
+                      {formatRupiah(order.fenderFee)}
+                    </TD>
+                  </TR>
+                )}
+
+                {/* Baris Jasa Mooring */}
+                {Boolean(order.mooringFee) && (
+                  <TR className="hover:bg-transparent">
+                    <TD className="py-2.5 px-3 font-sans">
+                      Jasa Mooring / Unmooring (Penambatan Kapal)
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right">1 Paket</TD>
+                    <TD className="py-2.5 px-3 text-right">
+                      {formatRupiah(order.mooringFee)}
+                    </TD>
+                    <TD className="py-2.5 px-3 text-right font-semibold">
+                      {formatRupiah(order.mooringFee)}
+                    </TD>
+                  </TR>
+                )}
+
+                {/* Baris Fender & Mooring Paket Gabungan */}
+                {!order.fenderFee &&
+                  !order.mooringFee &&
+                  Boolean(order.fenderMooringFee) && (
+                    <TR className="hover:bg-transparent">
+                      <TD className="py-2.5 px-3 font-sans">
+                        Layanan Jasa Fender & Mooring Kapal
+                      </TD>
+                      <TD className="py-2.5 px-3 text-right">1 Paket</TD>
+                      <TD className="py-2.5 px-3 text-right">
+                        {formatRupiah(order.fenderMooringFee)}
+                      </TD>
+                      <TD className="py-2.5 px-3 text-right font-semibold">
+                        {formatRupiah(order.fenderMooringFee)}
+                      </TD>
+                    </TR>
+                  )}
               </TBody>
             </table>
           </TableCard>

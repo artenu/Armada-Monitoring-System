@@ -51,9 +51,14 @@ export interface SalesOrderFields {
   kegiatanLokasi?: string;
   polJettyType?: "Private" | "Public";
 
-  // --- Tipe Tarif ---
+  // --- Tipe Tarif & Integrasi Kontrak ---
   rateType?: "Contract" | "Spot";
   customRatePerTon?: number;
+  contractNo?: string; // Nomor Kontrak Acuan
+  chargeUnit?: string; // Satuan Charge (/MT, /Document, /Lumpsum)
+  fenderFee?: number; // Biaya Jasa Fender
+  mooringFee?: number; // Biaya Jasa Mooring
+  fenderMooringFee?: number; // Total Biaya Fender & Mooring
 }
 
 export type OrderStatus =
@@ -130,7 +135,6 @@ export interface ValidateFilesParams {
   data: OrderFormData;
   spFile: File | null;
   rkbmFile: File | null;
-  rkbmBongkarFile: File | null;
   suratPenunjukanFile?: File | null;
   suratPermohonanFile?: File | null;
   suratPernyataanFile?: File | null;

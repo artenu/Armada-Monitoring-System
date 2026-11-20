@@ -102,6 +102,7 @@ export interface OperationalUpdatePayload {
   bargeNomination?: string;
   shipmentType?: string;
   status?: OrderStatus;
+  rkbmType?: "Bongkar" | "Muat" | "Muat & Bongkar";
 
   // Dokumen Trigger Finance
   rkbmMuatDocName?: string;

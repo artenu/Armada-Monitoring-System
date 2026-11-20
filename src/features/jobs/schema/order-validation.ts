@@ -1,6 +1,5 @@
 import type { ValidateFilesParams } from "@/types";
 import { isPbmService, isRkbmService } from "@/data/mock-data";
-
 /**
  * Validasi keberadaan berkas wajib (Surat Penunjukan, 3 Dokumen KSOP untuk RKBM)
  */
@@ -24,6 +23,7 @@ export const validateOrderFiles = ({
     }
   }
 
+  // 2. Layanan Pengurusan RKBM: Fleksibel berdasarkan berkas yang diunggah
   // 2. Layanan Pengurusan RKBM: 3 Dokumen Persyaratan KSOP wajib diunggah
   if (isRkbmService(data.service)) {
     if (!suratPenunjukanFile) {

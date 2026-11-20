@@ -13,6 +13,10 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
     isPbm,
     isRkbm,
     isCustoms,
+    isFenderMooring,
+    fenderFee,
+    mooringFee,
+    fenderMooringFee,
     isPnbpGratis,
     invoiceNo,
     setInvoiceNo,
@@ -54,7 +58,10 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
             </span>
             <span className="font-bold text-slate-800">{order.customer}</span>
             <span className="text-[10px] text-emerald-600 block font-semibold mt-0.5">
-              ✓ {contract?.service || order.service || "Kontrak Aktif"}
+              ✓{" "}
+              {order.contractNo || contract?.contractNo
+                ? `Kontrak: ${order.contractNo || contract?.contractNo}`
+                : contract?.service || order.service || "Kontrak Aktif"}
             </span>
           </div>
           <div>
@@ -180,6 +187,35 @@ export const ProcessInvoiceModal = (props: ProcessInvoiceModalProps) => {
                     <span>• Fee Penerbitan COO:</span>
                     <span className="font-mono font-medium">
                       {formatRupiah(cooFee)}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+
+            {isFenderMooring && (
+              <>
+                {fenderFee > 0 && (
+                  <div className="flex justify-between text-slate-600 pl-2">
+                    <span>• Jasa Fender:</span>
+                    <span className="font-mono font-medium">
+                      {formatRupiah(fenderFee)}
+                    </span>
+                  </div>
+                )}
+                {mooringFee > 0 && (
+                  <div className="flex justify-between text-slate-600 pl-2">
+                    <span>• Jasa Mooring:</span>
+                    <span className="font-mono font-medium">
+                      {formatRupiah(mooringFee)}
+                    </span>
+                  </div>
+                )}
+                {fenderFee === 0 && mooringFee === 0 && (
+                  <div className="flex justify-between text-slate-600 pl-2">
+                    <span>• Jasa Fender & Mooring (Paket):</span>
+                    <span className="font-mono font-medium">
+                      {formatRupiah(fenderMooringFee)}
                     </span>
                   </div>
                 )}
